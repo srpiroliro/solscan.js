@@ -7,7 +7,7 @@ A TypeScript client library for Solscan API. This library provides a convenient 
 ## Installation
 
 ```bash
-npm install solscan-api-ts
+npm install solscan-js
 ```
 
 ## Features
@@ -25,7 +25,7 @@ To use the Solscan Pro API endpoints, you need to obtain an API key from Solscan
 ## Basic Usage
 
 ```typescript
-import { SolscanAPI } from 'solscan-api-ts';
+import { SolscanAPI } from 'solscan-js';
 
 // Initialize with your API key
 const solscan = new SolscanAPI('YOUR_API_KEY');
@@ -174,7 +174,7 @@ async function getAccountInfo(address: string) {
 You can also use the API classes directly if you prefer:
 
 ```typescript
-import { TokenAPI } from 'solscan-api-ts';
+import { TokenAPI } from 'solscan-js';
 
 const tokenApi = new TokenAPI('YOUR_API_KEY');
 tokenApi.meta('TOKEN_ADDRESS')

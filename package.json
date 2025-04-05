@@ -1,5 +1,5 @@
 {
-  "name": "solscan-api-ts",
+  "name": "solscan-js",
   "version": "0.1.0",
   "description": "TypeScript client for Solscan API",
   "main": "dist/index.js",
