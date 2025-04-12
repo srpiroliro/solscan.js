@@ -15,6 +15,7 @@ export async function makeGetRequest(url: string, headers: Record<string, string
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
+      console.warn(error.response?.data);
       throw new Error(`API request failed: ${error.message}`);
     }
     throw error;

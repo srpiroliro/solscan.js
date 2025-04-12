@@ -1,7 +1,7 @@
 import { SolscanAPI } from './src';
 
 // Replace with your actual API key
-const API_KEY = 'YOUR_API_KEY';
+const API_KEY = "";
 
 // Initialize the Solscan API client
 const solscan = new SolscanAPI(API_KEY);
@@ -10,9 +10,9 @@ const solscan = new SolscanAPI(API_KEY);
 async function getChainInfo() {
   try {
     const result = await solscan.publicApi.chainInfo();
-    console.log('Chain Info:', result);
+    console.log("Chain Info:", result);
   } catch (error) {
-    console.error('Error getting chain info:', error);
+    console.error("Error getting chain info:", error);
   }
 }
 
@@ -20,9 +20,9 @@ async function getChainInfo() {
 async function getAccountDetails(address: string) {
   try {
     const result = await solscan.apiV2.account.detail(address);
-    console.log('Account Details:', result);
+    console.log("Account Details:", result);
   } catch (error) {
-    console.error('Error getting account details:', error);
+    console.error("Error getting account details:", error);
   }
 }
 
@@ -30,9 +30,9 @@ async function getAccountDetails(address: string) {
 async function getTokenMetadata(address: string) {
   try {
     const result = await solscan.apiV2.token.meta(address);
-    console.log('Token Metadata:', result);
+    console.log("Token Metadata:", result);
   } catch (error) {
-    console.error('Error getting token metadata:', error);
+    console.error("Error getting token metadata:", error);
   }
 }
 
@@ -40,9 +40,9 @@ async function getTokenMetadata(address: string) {
 async function getNFTNews() {
   try {
     const result = await solscan.apiV2.nft.news();
-    console.log('NFT News:', result);
+    console.log("NFT News:", result);
   } catch (error) {
-    console.error('Error getting NFT news:', error);
+    console.error("Error getting NFT news:", error);
   }
 }
 
@@ -50,15 +50,11 @@ async function getNFTNews() {
 async function getTransactionDetails(txSignature: string) {
   try {
     const result = await solscan.apiV2.transaction.detail(txSignature);
-    console.log('Transaction Details:', result);
+    console.log("Transaction Details:", result);
   } catch (error) {
-    console.error('Error getting transaction details:', error);
+    console.error("Error getting transaction details:", error);
   }
 }
 
 // Execute examples (uncomment to run)
-// getChainInfo();
-// getAccountDetails('YOUR_SOLANA_ADDRESS');
-// getTokenMetadata('YOUR_TOKEN_ADDRESS');
-// getNFTNews();
-// getTransactionDetails('YOUR_TRANSACTION_SIGNATURE'); 
+getChainInfo();

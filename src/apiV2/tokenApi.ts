@@ -1,5 +1,17 @@
 import { makeGetRequest, appendArrayParams, appendQueryParam } from '../utils';
 import { BaseApiV2 } from './baseApiV2';
+import { ApiV2Response } from "../types/general";
+import {
+  TokenMeta,
+  TokenMarket,
+  TokenTransfer,
+  TokenDefiActivities,
+  TokenPrice,
+  TokenPriceMulti,
+  TokenHolders,
+  TokenListItem,
+  TokenTop,
+} from "../types/token";
 
 /**
  * TokenAPI class for token-related endpoints
@@ -19,7 +31,7 @@ export class TokenAPI extends BaseApiV2 {
    * @param address Address of a token (required)
    * @returns Promise with token metadata
    */
-  public async meta(address: string): Promise<any> {
+  public async meta(address: string): Promise<ApiV2Response<TokenMeta>> {
     const methodUrl = `${this.urlModule}meta?address=${address}`;
     return makeGetRequest(methodUrl, this.headers);
   }
@@ -38,35 +50,35 @@ export class TokenAPI extends BaseApiV2 {
       page?: number;
       pageSize?: number;
     }
-  ): Promise<any> {
+  ): Promise<ApiV2Response<TokenMarket>> {
     if (!token || !token.length) {
-      throw new Error('Token pair addresses are required');
+      throw new Error("Token pair addresses are required");
     }
 
     let methodUrl = `${this.urlModule}markets?token[]=${token[0]}`;
-    
+
     // Add remaining tokens
     for (let i = 1; i < token.length; i++) {
-      methodUrl = appendQueryParam(methodUrl, 'token[]', token[i]);
+      methodUrl = appendQueryParam(methodUrl, "token[]", token[i]);
     }
 
     if (options) {
       const { sortBy, program, page, pageSize } = options;
 
       if (sortBy) {
-        methodUrl = appendQueryParam(methodUrl, 'sort_by', sortBy);
+        methodUrl = appendQueryParam(methodUrl, "sort_by", sortBy);
       }
 
       if (program && Array.isArray(program)) {
-        methodUrl = appendArrayParams(methodUrl, 'program', program);
+        methodUrl = appendArrayParams(methodUrl, "program", program);
       }
 
-      if (typeof page === 'number') {
-        methodUrl = appendQueryParam(methodUrl, 'page', page);
+      if (typeof page === "number") {
+        methodUrl = appendQueryParam(methodUrl, "page", page);
       }
 
-      if (typeof pageSize === 'number') {
-        methodUrl = appendQueryParam(methodUrl, 'page_size', pageSize);
+      if (typeof pageSize === "number") {
+        methodUrl = appendQueryParam(methodUrl, "page_size", pageSize);
       }
     }
 
@@ -78,7 +90,9 @@ export class TokenAPI extends BaseApiV2 {
    * @param address Address of a token (required)
    * @returns Promise with token market info
    */
-  public async marketInfo(address: string): Promise<any> {
+  public async marketInfo(
+    address: string
+  ): Promise<ApiV2Response<TokenMarket>> {
     const methodUrl = `${this.urlModule}market/info?address=${address}`;
     return makeGetRequest(methodUrl, this.headers);
   }
@@ -104,58 +118,70 @@ export class TokenAPI extends BaseApiV2 {
       sortBy?: string;
       sortOrder?: string;
     }
-  ): Promise<any> {
+  ): Promise<ApiV2Response<TokenTransfer>> {
     let methodUrl = `${this.urlModule}transfer?address=${address}`;
 
     if (options) {
-      const { 
-        activityType, tokenAccount, from, to, token, 
-        amount, excludeAmountZero, flow, blockTime, 
-        sortBy, sortOrder 
+      const {
+        activityType,
+        tokenAccount,
+        from,
+        to,
+        token,
+        amount,
+        excludeAmountZero,
+        flow,
+        blockTime,
+        sortBy,
+        sortOrder,
       } = options;
 
       if (activityType && Array.isArray(activityType)) {
-        methodUrl = appendArrayParams(methodUrl, 'activity_type', activityType);
+        methodUrl = appendArrayParams(methodUrl, "activity_type", activityType);
       }
 
       if (tokenAccount) {
-        methodUrl = appendQueryParam(methodUrl, 'token_account', tokenAccount);
+        methodUrl = appendQueryParam(methodUrl, "token_account", tokenAccount);
       }
 
       if (from) {
-        methodUrl = appendQueryParam(methodUrl, 'from', from);
+        methodUrl = appendQueryParam(methodUrl, "from", from);
       }
 
       if (to) {
-        methodUrl = appendQueryParam(methodUrl, 'to', to);
+        methodUrl = appendQueryParam(methodUrl, "to", to);
       }
 
       if (token) {
-        methodUrl = appendQueryParam(methodUrl, 'token', token);
+        methodUrl = appendQueryParam(methodUrl, "token", token);
       }
 
       if (amount && Array.isArray(amount)) {
-        methodUrl = appendArrayParams(methodUrl, 'amount', amount);
+        methodUrl = appendArrayParams(methodUrl, "amount", amount);
       }
 
-      if (typeof excludeAmountZero === 'boolean') {
-        methodUrl = appendQueryParam(methodUrl, 'exclude_amount_zero', excludeAmountZero);
+      if (typeof excludeAmountZero === "boolean") {
+        methodUrl = appendQueryParam(
+          methodUrl,
+          "exclude_amount_zero",
+          excludeAmountZero
+        );
       }
 
       if (flow) {
-        methodUrl = appendQueryParam(methodUrl, 'flow', flow);
+        methodUrl = appendQueryParam(methodUrl, "flow", flow);
       }
 
       if (blockTime && Array.isArray(blockTime)) {
-        methodUrl = appendArrayParams(methodUrl, 'block_time', blockTime);
+        methodUrl = appendArrayParams(methodUrl, "block_time", blockTime);
       }
 
       if (sortBy) {
-        methodUrl = appendQueryParam(methodUrl, 'sort_by', sortBy);
+        methodUrl = appendQueryParam(methodUrl, "sort_by", sortBy);
       }
 
       if (sortOrder) {
-        methodUrl = appendQueryParam(methodUrl, 'sort_order', sortOrder);
+        methodUrl = appendQueryParam(methodUrl, "sort_order", sortOrder);
       }
     }
 
@@ -182,53 +208,61 @@ export class TokenAPI extends BaseApiV2 {
       sortBy?: string;
       sortOrder?: string;
     }
-  ): Promise<any> {
+  ): Promise<ApiV2Response<TokenDefiActivities>> {
     let methodUrl = `${this.urlModule}defi/activities?address=${address}`;
 
     if (options) {
-      const { 
-        activityType, from, platform, source, token, 
-        blockTime, page, pageSize, sortBy, sortOrder 
+      const {
+        activityType,
+        from,
+        platform,
+        source,
+        token,
+        blockTime,
+        page,
+        pageSize,
+        sortBy,
+        sortOrder,
       } = options;
 
       if (activityType && Array.isArray(activityType)) {
-        methodUrl = appendArrayParams(methodUrl, 'activity_type', activityType);
+        methodUrl = appendArrayParams(methodUrl, "activity_type", activityType);
       }
 
       if (from) {
-        methodUrl = appendQueryParam(methodUrl, 'from', from);
+        methodUrl = appendQueryParam(methodUrl, "from", from);
       }
 
       if (platform && Array.isArray(platform)) {
-        methodUrl = appendArrayParams(methodUrl, 'platform', platform);
+        methodUrl = appendArrayParams(methodUrl, "platform", platform);
       }
 
       if (source && Array.isArray(source)) {
-        methodUrl = appendArrayParams(methodUrl, 'source', source);
+        methodUrl = appendArrayParams(methodUrl, "source", source);
       }
 
       if (token) {
-        methodUrl = appendQueryParam(methodUrl, 'token', token);
+        methodUrl = appendQueryParam(methodUrl, "token", token);
       }
 
       if (blockTime && Array.isArray(blockTime)) {
-        methodUrl = appendArrayParams(methodUrl, 'block_time', blockTime);
+        methodUrl = appendArrayParams(methodUrl, "block_time", blockTime);
       }
 
-      if (typeof page === 'number') {
-        methodUrl = appendQueryParam(methodUrl, 'page', page);
+      if (typeof page === "number") {
+        methodUrl = appendQueryParam(methodUrl, "page", page);
       }
 
-      if (typeof pageSize === 'number') {
-        methodUrl = appendQueryParam(methodUrl, 'page_size', pageSize);
+      if (typeof pageSize === "number") {
+        methodUrl = appendQueryParam(methodUrl, "page_size", pageSize);
       }
 
       if (sortBy) {
-        methodUrl = appendQueryParam(methodUrl, 'sort_by', sortBy);
+        methodUrl = appendQueryParam(methodUrl, "sort_by", sortBy);
       }
 
       if (sortOrder) {
-        methodUrl = appendQueryParam(methodUrl, 'sort_order', sortOrder);
+        methodUrl = appendQueryParam(methodUrl, "sort_order", sortOrder);
       }
     }
 
@@ -240,29 +274,27 @@ export class TokenAPI extends BaseApiV2 {
    * @param options Optional parameters
    * @returns Promise with token list
    */
-  public async tokenList(
-    options?: {
-      page?: number;
-      pageSize?: number;
-      sortBy?: string;
-      sortOrder?: string;
-    }
-  ): Promise<any> {
+  public async tokenList(options?: {
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    sortOrder?: string;
+  }): Promise<ApiV2Response<TokenListItem>> {
     let methodUrl = `${this.urlModule}list?page=${options?.page || 1}`;
 
     if (options) {
       const { pageSize, sortBy, sortOrder } = options;
 
-      if (typeof pageSize === 'number') {
-        methodUrl = appendQueryParam(methodUrl, 'page_size', pageSize);
+      if (typeof pageSize === "number") {
+        methodUrl = appendQueryParam(methodUrl, "page_size", pageSize);
       }
 
       if (sortBy) {
-        methodUrl = appendQueryParam(methodUrl, 'sort_by', sortBy);
+        methodUrl = appendQueryParam(methodUrl, "sort_by", sortBy);
       }
 
       if (sortOrder) {
-        methodUrl = appendQueryParam(methodUrl, 'sort_order', sortOrder);
+        methodUrl = appendQueryParam(methodUrl, "sort_order", sortOrder);
       }
     }
 
@@ -280,11 +312,11 @@ export class TokenAPI extends BaseApiV2 {
     options?: {
       time?: number[];
     }
-  ): Promise<any> {
+  ): Promise<ApiV2Response<TokenPrice>> {
     let methodUrl = `${this.urlModule}market/volume?address=${address}`;
 
     if (options?.time && Array.isArray(options.time)) {
-      methodUrl = appendArrayParams(methodUrl, 'time', options.time);
+      methodUrl = appendArrayParams(methodUrl, "time", options.time);
     }
 
     return makeGetRequest(methodUrl, this.headers);
@@ -295,7 +327,9 @@ export class TokenAPI extends BaseApiV2 {
    * @param limit Number of items to return (default: 10)
    * @returns Promise with trending tokens
    */
-  public async trending(limit: number = 10): Promise<any> {
+  public async trending(
+    limit: number = 10
+  ): Promise<ApiV2Response<TokenListItem>> {
     const methodUrl = `${this.urlModule}trending?limit=${limit}`;
     return makeGetRequest(methodUrl, this.headers);
   }
@@ -311,11 +345,11 @@ export class TokenAPI extends BaseApiV2 {
     options?: {
       time?: number[];
     }
-  ): Promise<any> {
+  ): Promise<ApiV2Response<TokenPrice>> {
     let methodUrl = `${this.urlModule}price?address=${address}`;
 
     if (options?.time && Array.isArray(options.time)) {
-      methodUrl = appendArrayParams(methodUrl, 'time', options.time);
+      methodUrl = appendArrayParams(methodUrl, "time", options.time);
     }
 
     return makeGetRequest(methodUrl, this.headers);
@@ -335,22 +369,24 @@ export class TokenAPI extends BaseApiV2 {
       fromAmount?: number;
       toAmount?: number;
     }
-  ): Promise<any> {
-    let methodUrl = `${this.urlModule}holders?address=${address}&page=${options?.page || 1}`;
+  ): Promise<ApiV2Response<TokenHolders>> {
+    let methodUrl = `${this.urlModule}holders?address=${address}&page=${
+      options?.page || 1
+    }`;
 
     if (options) {
       const { pageSize, fromAmount, toAmount } = options;
 
-      if (typeof pageSize === 'number') {
-        methodUrl = appendQueryParam(methodUrl, 'page_size', pageSize);
+      if (typeof pageSize === "number") {
+        methodUrl = appendQueryParam(methodUrl, "page_size", pageSize);
       }
 
-      if (typeof fromAmount === 'number') {
-        methodUrl = appendQueryParam(methodUrl, 'from_amount', fromAmount);
+      if (typeof fromAmount === "number") {
+        methodUrl = appendQueryParam(methodUrl, "from_amount", fromAmount);
       }
 
-      if (typeof toAmount === 'number') {
-        methodUrl = appendQueryParam(methodUrl, 'to_amount', toAmount);
+      if (typeof toAmount === "number") {
+        methodUrl = appendQueryParam(methodUrl, "to_amount", toAmount);
       }
     }
 
@@ -361,7 +397,7 @@ export class TokenAPI extends BaseApiV2 {
    * Get the list of top tokens
    * @returns Promise with top tokens
    */
-  public async top(): Promise<any> {
+  public async top(): Promise<ApiV2Response<TokenTop>> {
     const methodUrl = `${this.urlModule}top`;
     return makeGetRequest(methodUrl, this.headers);
   }
