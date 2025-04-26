@@ -118,7 +118,7 @@ export type TokenListItem = {
   market_cap: number;
   price: number;
   price_24h_change: number;
-  holder: number;
+  holder: number; // number of holders
   created_time: number;
 };
 

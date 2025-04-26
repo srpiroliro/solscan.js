@@ -1,6 +1,6 @@
 import { makeGetRequest, appendArrayParams, appendQueryParam } from '../utils';
 import { BaseApiV2 } from './baseApiV2';
-import { ApiV2Response } from "../types/general";
+import { ApiV2Response, SortByOrder } from "../types/general";
 import {
   TokenMeta,
   TokenMarket,
@@ -11,6 +11,8 @@ import {
   TokenHolders,
   TokenListItem,
   TokenTop,
+  TokenListSortBy,
+  TokenList,
 } from "../types/token";
 
 /**
@@ -274,12 +276,12 @@ export class TokenAPI extends BaseApiV2 {
    * @param options Optional parameters
    * @returns Promise with token list
    */
-  public async tokenList(options?: {
+  public async list(options?: {
     page?: number;
-    pageSize?: number;
-    sortBy?: string;
-    sortOrder?: string;
-  }): Promise<ApiV2Response<TokenListItem>> {
+    pageSize?: 10 | 20 | 30 | 40 | 60 | 100;
+    sortBy?: "holder" | "market_cap" | "created_time";
+    sortOrder?: SortByOrder;
+  }): Promise<ApiV2Response<TokenList>> {
     let methodUrl = `${this.urlModule}list?page=${options?.page || 1}`;
 
     if (options) {
@@ -401,4 +403,4 @@ export class TokenAPI extends BaseApiV2 {
     const methodUrl = `${this.urlModule}top`;
     return makeGetRequest(methodUrl, this.headers);
   }
-} 
+}

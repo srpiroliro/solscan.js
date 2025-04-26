@@ -6,3 +6,5 @@ export type ApiV2Response<T> = {
 		message: string
 	}
 }
+
+export type SortByOrder = "asc" |  "desc";
