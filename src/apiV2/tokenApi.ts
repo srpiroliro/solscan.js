@@ -1,5 +1,5 @@
-import { makeGetRequest, appendArrayParams, appendQueryParam } from '../utils';
-import { BaseApiV2 } from './baseApiV2';
+import { makeGetRequest, appendArrayParams, appendQueryParam } from "../utils";
+import { BaseApiV2 } from "./baseApiV2";
 import { ApiV2Response, SortByOrder } from "../types/general";
 import {
   TokenMeta,
@@ -11,7 +11,6 @@ import {
   TokenHolders,
   TokenListItem,
   TokenTop,
-  TokenListSortBy,
   TokenList,
 } from "../types/token";
 
@@ -39,6 +38,18 @@ export class TokenAPI extends BaseApiV2 {
   }
 
   /**
+   * Get the metadata of a token
+   * @param address Address of a token (required)
+   * @returns Promise with token metadata
+   */
+  public async metaMulti(
+    addresses: string[],
+  ): Promise<ApiV2Response<TokenMeta[]>> {
+    const methodUrl = `${this.urlModule}meta?address=${addresses.join(",")}`;
+    return makeGetRequest(methodUrl, this.headers);
+  }
+
+  /**
    * Get token markets
    * @param token Token pair addresses
    * @param options Optional parameters
@@ -51,7 +62,7 @@ export class TokenAPI extends BaseApiV2 {
       program?: string[];
       page?: number;
       pageSize?: number;
-    }
+    },
   ): Promise<ApiV2Response<TokenMarket>> {
     if (!token || !token.length) {
       throw new Error("Token pair addresses are required");
@@ -93,7 +104,7 @@ export class TokenAPI extends BaseApiV2 {
    * @returns Promise with token market info
    */
   public async marketInfo(
-    address: string
+    address: string,
   ): Promise<ApiV2Response<TokenMarket>> {
     const methodUrl = `${this.urlModule}market/info?address=${address}`;
     return makeGetRequest(methodUrl, this.headers);
@@ -119,7 +130,7 @@ export class TokenAPI extends BaseApiV2 {
       blockTime?: number[];
       sortBy?: string;
       sortOrder?: string;
-    }
+    },
   ): Promise<ApiV2Response<TokenTransfer>> {
     let methodUrl = `${this.urlModule}transfer?address=${address}`;
 
@@ -166,7 +177,7 @@ export class TokenAPI extends BaseApiV2 {
         methodUrl = appendQueryParam(
           methodUrl,
           "exclude_amount_zero",
-          excludeAmountZero
+          excludeAmountZero,
         );
       }
 
@@ -206,11 +217,11 @@ export class TokenAPI extends BaseApiV2 {
       token?: string;
       blockTime?: number[];
       page?: number;
-      pageSize?: number;
-      sortBy?: string;
-      sortOrder?: string;
-    }
-  ): Promise<ApiV2Response<TokenDefiActivities>> {
+      pageSize?: 10 | 20 | 30 | 40 | 60 | 100;
+      sortBy?: "block_time";
+      sortOrder?: SortByOrder;
+    },
+  ): Promise<ApiV2Response<TokenDefiActivities[]>> {
     let methodUrl = `${this.urlModule}defi/activities?address=${address}`;
 
     if (options) {
@@ -313,7 +324,7 @@ export class TokenAPI extends BaseApiV2 {
     address: string,
     options?: {
       time?: number[];
-    }
+    },
   ): Promise<ApiV2Response<TokenPrice>> {
     let methodUrl = `${this.urlModule}market/volume?address=${address}`;
 
@@ -330,7 +341,7 @@ export class TokenAPI extends BaseApiV2 {
    * @returns Promise with trending tokens
    */
   public async trending(
-    limit: number = 10
+    limit: number = 10,
   ): Promise<ApiV2Response<TokenListItem>> {
     const methodUrl = `${this.urlModule}trending?limit=${limit}`;
     return makeGetRequest(methodUrl, this.headers);
@@ -346,7 +357,7 @@ export class TokenAPI extends BaseApiV2 {
     address: string,
     options?: {
       time?: number[];
-    }
+    },
   ): Promise<ApiV2Response<TokenPrice>> {
     let methodUrl = `${this.urlModule}price?address=${address}`;
 
@@ -367,10 +378,10 @@ export class TokenAPI extends BaseApiV2 {
     address: string,
     options?: {
       page?: number;
-      pageSize?: number;
+      pageSize?: 10 | 20 | 30 | 40;
       fromAmount?: number;
       toAmount?: number;
-    }
+    },
   ): Promise<ApiV2Response<TokenHolders>> {
     let methodUrl = `${this.urlModule}holders?address=${address}&page=${
       options?.page || 1

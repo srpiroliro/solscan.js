@@ -37,8 +37,8 @@ export type TokenDefiActivities = {
   activity_type: string;
   from_address: string;
   to_address: string;
-  sources: string[];
   platform: string;
+  sources: string[];
   routers: Routers;
 };
 
@@ -128,3 +128,16 @@ export type TokenTop = {
   total: number;
   items: TokenListItem[];
 };
+
+export enum DefiActivity {
+  ACTIVITY_TOKEN_SWAP,
+  ACTIVITY_AGG_TOKEN_SWAP,
+  ACTIVITY_TOKEN_ADD_LIQ,
+  ACTIVITY_TOKEN_REMOVE_LIQ,
+  ACTIVITY_SPL_TOKEN_STAKE,
+  ACTIVITY_SPL_TOKEN_UNSTAKE,
+  ACTIVITY_TOKEN_DEPOSIT_VAULT,
+  ACTIVITY_TOKEN_WITHDRAW_VAULT,
+  ACTIVITY_SPL_INIT_MINT,
+  ACTIVITY_ORDERBOOK_ORDER_PLACE,
+}

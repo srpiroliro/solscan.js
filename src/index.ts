@@ -38,5 +38,4 @@ export class SolscanAPI {
   }
 }
 
-// Export other classes for direct usage if needed
-export { PublicAPI, APIV2 }; 
+export { PublicAPI, APIV2 };
