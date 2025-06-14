@@ -1,5 +1,5 @@
 import { makeGetRequest, appendQueryParam } from '../utils';
-import { BaseApiV2 } from './baseApiV2';
+import { BaseApiV2 } from "./base";
 
 /**
  * TransactionAPI class for transaction-related endpoints

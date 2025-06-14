@@ -1,5 +1,5 @@
 import { makeGetRequest } from '../utils';
-import { BaseApiV2 } from './baseApiV2';
+import { BaseApiV2 } from "./base";
 
 /**
  * MonitoringAPI class for monitoring-related endpoints

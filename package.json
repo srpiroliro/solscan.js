@@ -24,7 +24,6 @@
     "test:all": "jest tests/",
     "test:coverage": "jest tests/ --coverage",
     "test:watch": "jest tests/ --watch",
-    "publish": "npm run build && npm publish",
     "example": "ts-node  example.ts",
     "prepare": "npm run build"
   },

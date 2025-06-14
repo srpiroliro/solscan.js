@@ -14,7 +14,7 @@ import {
 } from "../types/account";
 import { ApiV2Response, SortByOrder } from "../types/general";
 import { makeGetRequest, appendArrayParams, appendQueryParam } from "../utils";
-import { BaseApiV2 } from "./baseApiV2";
+import { BaseApiV2 } from "./base";
 
 /**
  * AccountAPI class for account-related endpoints

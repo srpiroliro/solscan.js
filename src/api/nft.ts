@@ -1,5 +1,5 @@
 import { makeGetRequest, appendArrayParams, appendQueryParam } from '../utils';
-import { BaseApiV2 } from './baseApiV2';
+import { BaseApiV2 } from "./base";
 
 /**
  * NFTAPI class for NFT-related endpoints

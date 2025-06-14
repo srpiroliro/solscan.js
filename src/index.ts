@@ -1,37 +1,11 @@
-import { APIV2 } from "./apiV2";
-import { AccountAPI } from "./apiV2/account";
-import { TokenAPI } from "./apiV2/tokenApi";
-import { NFTAPI } from "./apiV2/nftApi";
-import { TransactionAPI } from "./apiV2/transactionApi";
-import { BlockAPI } from "./apiV2/blockApi";
-import { MonitoringAPI } from "./apiV2/monitoringApi";
+import { AccountAPI } from "./api/account";
+import { TokenAPI } from "./api/token";
+import { NFTAPI } from "./api/nft";
+import { TransactionAPI } from "./api/transaction";
+import { BlockAPI } from "./api/block";
+import { MonitoringAPI } from "./api/monitoring";
 import { makeGetRequest } from "./utils";
-
-/**
- * PublicAPI functionality integrated into main SolscanAPI class
- */
-class PublicAPIIntegration {
-  private url: string;
-  private headers: Record<string, string>;
-
-  /**
-   * Creates a new instance of PublicAPI integration
-   * @param apiKey API key for authentication
-   */
-  constructor(apiKey: string) {
-    this.url = "https://public-api.solscan.io/";
-    this.headers = { token: apiKey };
-  }
-
-  /**
-   * Get chain information
-   * @returns Promise with chain information
-   */
-  public async chainInfo(): Promise<any> {
-    const methodUrl = `${this.url}chaininfo`;
-    return makeGetRequest(methodUrl, this.headers);
-  }
-}
+import { PublicAPI } from "./api/public";
 
 /**
  * Main class for Solscan API client
@@ -39,7 +13,7 @@ class PublicAPIIntegration {
 export class SolscanAPI {
   private _apiKey: string;
 
-  private _publicApi?: PublicAPIIntegration;
+  private _publicApi?: PublicAPI;
 
   private _account?: AccountAPI;
   private _token?: TokenAPI;
@@ -59,9 +33,9 @@ export class SolscanAPI {
   /**
    * Get public API endpoints
    */
-  get public(): PublicAPIIntegration {
+  get public(): PublicAPI {
     if (!this._publicApi) {
-      this._publicApi = new PublicAPIIntegration(this._apiKey);
+      this._publicApi = new PublicAPI(this._apiKey);
     }
     return this._publicApi;
   }

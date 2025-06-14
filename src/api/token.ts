@@ -1,5 +1,5 @@
 import { makeGetRequest, appendArrayParams, appendQueryParam } from "../utils";
-import { BaseApiV2 } from "./baseApiV2";
+import { BaseApiV2 } from "./base";
 import { ApiV2Response, SortByOrder } from "../types/general";
 import {
   TokenMeta,

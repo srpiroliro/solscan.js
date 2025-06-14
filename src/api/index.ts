@@ -1,9 +1,9 @@
 import { AccountAPI } from "./account";
-import { TokenAPI } from "./tokenApi";
-import { NFTAPI } from "./nftApi";
-import { TransactionAPI } from "./transactionApi";
-import { BlockAPI } from "./blockApi";
-import { MonitoringAPI } from "./monitoringApi";
+import { TokenAPI } from "./token";
+import { NFTAPI } from "./nft";
+import { TransactionAPI } from "./transaction";
+import { BlockAPI } from "./block";
+import { MonitoringAPI } from "./monitoring";
 
 /**
  * Main API V2 client
