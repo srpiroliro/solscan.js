@@ -1,9 +1,9 @@
-import { AccountAPI } from './accountApi';
-import { TokenAPI } from './tokenApi';
-import { NFTAPI } from './nftApi';
-import { TransactionAPI } from './transactionApi';
-import { BlockAPI } from './blockApi';
-import { MonitoringAPI } from './monitoringApi';
+import { AccountAPI } from "./account";
+import { TokenAPI } from "./tokenApi";
+import { NFTAPI } from "./nftApi";
+import { TransactionAPI } from "./transactionApi";
+import { BlockAPI } from "./blockApi";
+import { MonitoringAPI } from "./monitoringApi";
 
 /**
  * Main API V2 client
@@ -84,4 +84,4 @@ export class APIV2 {
     }
     return this._monitoring;
   }
-} 
+}

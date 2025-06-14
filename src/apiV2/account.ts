@@ -506,10 +506,29 @@ export class AccountAPI extends BaseApiV2 {
     return makeGetRequest(methodUrl, this.headers);
   }
 
-  public async leaderboard(
-    address: string,
-  ): Promise<ApiV2Response<AccountLeaderboard>> {
-    let methodUrl = `${this.urlModule}leaderboard?address=${address}`;
+  public async leaderboard(options: {
+    sortBy?: "sol_values" | "stake_values" | "token_values" | "total_values";
+    sortOrder?: SortByOrder;
+    page?: number;
+    pageSize?: 10 | 20 | 30 | 40 | 60 | 100;
+  }): Promise<ApiV2Response<AccountLeaderboard>> {
+    let methodUrl = `${this.urlModule}leaderboard`;
+
+    if (options.sortBy) {
+      methodUrl = appendQueryParam(methodUrl, "sort_by", options.sortBy);
+    }
+
+    if (options.sortOrder) {
+      methodUrl = appendQueryParam(methodUrl, "sort_order", options.sortOrder);
+    }
+
+    if (options.page) {
+      methodUrl = appendQueryParam(methodUrl, "page", options.page);
+    }
+
+    if (options.pageSize) {
+      methodUrl = appendQueryParam(methodUrl, "page_size", options.pageSize);
+    }
 
     return makeGetRequest(methodUrl, this.headers);
   }

@@ -31,20 +31,25 @@ import { SolscanAPI } from 'solscan-js';
 const solscan = new SolscanAPI('YOUR_API_KEY');
 
 // Public API - Chain info
-solscan.publicApi.chainInfo()
+solscan.public.chainInfo()
+  .then(result => console.log(result))
+  .catch(error => console.error(error));
+
+// Direct access to account transfers
+solscan.account.transfer('ADDRESS')
   .then(result => console.log(result))
   .catch(error => console.error(error));
 ```
 
 ## API Sections
 
-The library is organized into different sections that match the Solscan API structure:
+The library provides direct access to all API endpoints. You can now use clean, direct calls without nested structures:
 
 ### Public API
 
 ```typescript
 // Get chain information
-solscan.publicApi.chainInfo()
+solscan.public.chainInfo()
   .then(result => console.log(result))
   .catch(error => console.error(error));
 ```
@@ -53,21 +58,34 @@ solscan.publicApi.chainInfo()
 
 ```typescript
 // Get account details
-solscan.apiV2.account.detail('ADDRESS')
+solscan.account.detail('ADDRESS')
+  .then(result => console.log(result))
+  .catch(error => console.error(error));
+
+// Get account transfers (direct access!)
+solscan.account.transfer('ADDRESS')
   .then(result => console.log(result))
   .catch(error => console.error(error));
 
 // Get account token accounts
-solscan.apiV2.account.tokenAccounts('ADDRESS', 'token', { hideZero: true })
+solscan.account.tokenAccounts('ADDRESS', 'token', { hideZero: true })
   .then(result => console.log(result))
   .catch(error => console.error(error));
 
 // Get defi activities
-solscan.apiV2.account.defiActivities('ADDRESS', {
+solscan.account.defiActivities('ADDRESS', {
   page: 1,
   pageSize: 20,
   sortBy: 'block_time',
   sortOrder: 'desc'
+})
+  .then(result => console.log(result))
+  .catch(error => console.error(error));
+
+// Get balance change activities
+solscan.account.balanceChangeActivities('ADDRESS', {
+  page: 1,
+  pageSize: 20
 })
   .then(result => console.log(result))
   .catch(error => console.error(error));
@@ -77,17 +95,27 @@ solscan.apiV2.account.defiActivities('ADDRESS', {
 
 ```typescript
 // Get token metadata
-solscan.apiV2.token.meta('TOKEN_ADDRESS')
+solscan.token.meta('TOKEN_ADDRESS')
   .then(result => console.log(result))
   .catch(error => console.error(error));
 
 // Get trending tokens
-solscan.apiV2.token.trending(10)
+solscan.token.trending(10)
   .then(result => console.log(result))
   .catch(error => console.error(error));
 
 // Get token price
-solscan.apiV2.token.tokenPrice('TOKEN_ADDRESS')
+solscan.token.tokenPrice('TOKEN_ADDRESS')
+  .then(result => console.log(result))
+  .catch(error => console.error(error));
+
+// Get top tokens
+solscan.token.top()
+  .then(result => console.log(result))
+  .catch(error => console.error(error));
+
+// Get token defi activities
+solscan.token.defiActivities('TOKEN_ADDRESS')
   .then(result => console.log(result))
   .catch(error => console.error(error));
 ```
@@ -96,17 +124,17 @@ solscan.apiV2.token.tokenPrice('TOKEN_ADDRESS')
 
 ```typescript
 // Get NFT news
-solscan.apiV2.nft.news()
+solscan.nft.news()
   .then(result => console.log(result))
   .catch(error => console.error(error));
 
 // Get NFT collections
-solscan.apiV2.nft.collectionLists({ range: 7 })
+solscan.nft.collectionLists({ range: 7 })
   .then(result => console.log(result))
   .catch(error => console.error(error));
 
 // Get collection items
-solscan.apiV2.nft.collectionItems('COLLECTION_ID')
+solscan.nft.collectionItems('COLLECTION_ID')
   .then(result => console.log(result))
   .catch(error => console.error(error));
 ```
@@ -115,12 +143,12 @@ solscan.apiV2.nft.collectionItems('COLLECTION_ID')
 
 ```typescript
 // Get transaction details
-solscan.apiV2.transaction.detail('TX_SIGNATURE')
+solscan.transaction.detail('TX_SIGNATURE')
   .then(result => console.log(result))
   .catch(error => console.error(error));
 
 // Get latest transactions
-solscan.apiV2.transaction.last({ limit: 20 })
+solscan.transaction.last({ limit: 20 })
   .then(result => console.log(result))
   .catch(error => console.error(error));
 ```
@@ -129,12 +157,12 @@ solscan.apiV2.transaction.last({ limit: 20 })
 
 ```typescript
 // Get latest blocks
-solscan.apiV2.block.last(50)
+solscan.block.last(50)
   .then(result => console.log(result))
   .catch(error => console.error(error));
 
 // Get block details
-solscan.apiV2.block.detail(BLOCK_NUMBER)
+solscan.block.detail(BLOCK_NUMBER)
   .then(result => console.log(result))
   .catch(error => console.error(error));
 ```
@@ -143,7 +171,7 @@ solscan.apiV2.block.detail(BLOCK_NUMBER)
 
 ```typescript
 // Get API usage information
-solscan.apiV2.monitoring.usage()
+solscan.monitoring.usage()
   .then(result => console.log(result))
   .catch(error => console.error(error));
 ```
@@ -155,18 +183,36 @@ solscan.apiV2.monitoring.usage()
 ```typescript
 async function getAccountInfo(address: string) {
   try {
-    const accountDetail = await solscan.apiV2.account.detail(address);
-    const tokenAccounts = await solscan.apiV2.account.tokenAccounts(address, 'token');
+    const accountDetail = await solscan.account.detail(address);
+    const tokenAccounts = await solscan.account.tokenAccounts(address, 'token');
+    const transfers = await solscan.account.transfer(address);
     
     return {
       account: accountDetail,
-      tokens: tokenAccounts
+      tokens: tokenAccounts,
+      transfers: transfers
     };
   } catch (error) {
     console.error('Error fetching account info:', error);
     throw error;
   }
 }
+```
+
+### Legacy API Access (Backward Compatibility)
+
+If you have existing code using the old structure, it will still work:
+
+```typescript
+// Legacy access (still supported)
+solscan.apiV2.account.detail('ADDRESS')
+  .then(result => console.log(result))
+  .catch(error => console.error(error));
+
+// But you can now use the cleaner direct access:
+solscan.account.detail('ADDRESS')
+  .then(result => console.log(result))
+  .catch(error => console.error(error));
 ```
 
 ### Direct class usage
@@ -182,13 +228,31 @@ tokenApi.meta('TOKEN_ADDRESS')
   .catch(error => console.error(error));
 ```
 
+## Migration Guide
+
+If you're upgrading from a previous version, you can easily migrate to the new direct access pattern:
+
+```typescript
+// Old way
+solscan.apiV2.account.transfer('ADDRESS')
+solscan.apiV2.token.meta('TOKEN_ADDRESS')
+solscan.publicApi.chainInfo()
+
+// New way (recommended)
+solscan.account.transfer('ADDRESS')
+solscan.token.meta('TOKEN_ADDRESS')
+solscan.public.chainInfo()
+```
+
+The old way still works for backward compatibility, but the new direct access is cleaner and more intuitive.
+
 ## Error Handling
 
 All API methods return promises that will reject with an error if the API request fails. We recommend using try/catch blocks or promise error handlers to handle these cases.
 
 ```typescript
 try {
-  const result = await solscan.apiV2.account.detail('ADDRESS');
+  const result = await solscan.account.detail('ADDRESS');
   // Process result
 } catch (error) {
   // Handle error

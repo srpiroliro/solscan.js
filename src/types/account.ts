@@ -154,3 +154,12 @@ export type AccountLeaderboard = {
     total_values: number;
   }[];
 };
+
+export type AccountStake = {
+  stake_account: string;
+  validator: string;
+  amount: number;
+  status: string;
+  activation_epoch: number;
+  deactivation_epoch: number | null;
+};
