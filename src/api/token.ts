@@ -45,7 +45,15 @@ export class TokenAPI extends BaseApiV2 {
   public async metaMulti(
     addresses: string[],
   ): Promise<ApiV2Response<TokenMeta[]>> {
-    const methodUrl = `${this.urlModule}meta?address=${addresses.join(",")}`;
+    let methodUrl = `${this.urlModule}meta/multi`;
+
+    if (!addresses?.length) throw new Error("Addresses are required");
+
+    methodUrl += `?address[]=${addresses[0]}`;
+    for (let i = 1; i < addresses.length; i++) {
+      methodUrl += `&address[]=${addresses[i]}`;
+    }
+
     return makeGetRequest(methodUrl, this.headers);
   }
 
