@@ -63,7 +63,7 @@ export class TokenAPI extends BaseApiV2 {
       page?: number;
       pageSize?: number;
     },
-  ): Promise<ApiV2Response<TokenMarket>> {
+  ): Promise<ApiV2Response<TokenMarket[]>> {
     if (!token || !token.length) {
       throw new Error("Token pair addresses are required");
     }
@@ -340,9 +340,7 @@ export class TokenAPI extends BaseApiV2 {
    * @param limit Number of items to return (default: 10)
    * @returns Promise with trending tokens
    */
-  public async trending(
-    limit: number = 10,
-  ): Promise<ApiV2Response<TokenListItem>> {
+  public async trending(limit: number = 10): Promise<ApiV2Response<TokenList>> {
     const methodUrl = `${this.urlModule}trending?limit=${limit}`;
     return makeGetRequest(methodUrl, this.headers);
   }
