@@ -55,24 +55,25 @@ export type AccountDefiActivity = {
   time: string;
   activity_type: string;
   from_address: string;
-  to_address: string;
-  sources: {
-    platform: string;
-    routers: Array<{
+  sources: string[];
+  platform: string[];
+  value: number;
+  routers: {
+    token1: string;
+    token1_decimals: number;
+    amount1: number | null;
+    token2?: string;
+    token2_decimals: number;
+    amount2?: number;
+    child_routers?: Array<{
       token1: string;
       token1_decimals: number;
       amount1: string;
       token2: string;
       token2_decimals: number;
       amount2: string;
-    }>;
-    child_routers: Array<{
-      token1: string;
-      token1_decimals: number;
-      amount1: string;
-      token2: string;
-      token2_decimals: number;
-      amount2: string;
+      program_address: string;
+      pool_address: string;
     }>;
   };
 };

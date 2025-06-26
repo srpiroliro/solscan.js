@@ -7,12 +7,12 @@ import {
   TokenTransfer,
   TokenDefiActivities,
   TokenPrice,
-  TokenPriceMulti,
   TokenHolders,
-  TokenListItem,
   TokenTop,
   TokenList,
 } from "../types/token";
+
+export const MUTLIMETA_MAX_BATCH = 20;
 
 /**
  * TokenAPI class for token-related endpoints
