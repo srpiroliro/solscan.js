@@ -58,34 +58,32 @@ export function validateAccountDefiActivity(
     typeof data.time === "string" &&
     typeof data.activity_type === "string" &&
     typeof data.from_address === "string" &&
-    typeof data.to_address === "string" &&
-    typeof data.sources === "object" &&
-    data.sources !== null &&
-    typeof data.sources.platform === "string" &&
-    Array.isArray(data.sources.routers) &&
-    data.sources.routers.every(
-      (router: any) =>
-        typeof router === "object" &&
-        router !== null &&
-        typeof router.token1 === "string" &&
-        typeof router.token1_decimals === "number" &&
-        typeof router.amount1 === "string" &&
-        typeof router.token2 === "string" &&
-        typeof router.token2_decimals === "number" &&
-        typeof router.amount2 === "string"
-    ) &&
-    Array.isArray(data.sources.child_routers) &&
-    data.sources.child_routers.every(
-      (router: any) =>
-        typeof router === "object" &&
-        router !== null &&
-        typeof router.token1 === "string" &&
-        typeof router.token1_decimals === "number" &&
-        typeof router.amount1 === "string" &&
-        typeof router.token2 === "string" &&
-        typeof router.token2_decimals === "number" &&
-        typeof router.amount2 === "string"
-    )
+    Array.isArray(data.sources) &&
+    Array.isArray(data.platform) &&
+    typeof data.value === "number" &&
+    typeof data.routers === "object" &&
+    data.routers !== null &&
+    typeof data.routers.token1 === "string" &&
+    typeof data.routers.token1_decimals === "number" &&
+    (data.routers.amount1 === null || typeof data.routers.amount1 === "number") &&
+    typeof data.routers.token2_decimals === "number" &&
+    (data.routers.token2 === undefined || typeof data.routers.token2 === "string") &&
+    (data.routers.amount2 === undefined || typeof data.routers.amount2 === "number") &&
+    (data.routers.child_routers === undefined || 
+      (Array.isArray(data.routers.child_routers) &&
+        data.routers.child_routers.every(
+          (router: any) =>
+            typeof router === "object" &&
+            router !== null &&
+            typeof router.token1 === "string" &&
+            typeof router.token1_decimals === "number" &&
+            typeof router.amount1 === "string" &&
+            typeof router.token2 === "string" &&
+            typeof router.token2_decimals === "number" &&
+            typeof router.amount2 === "string" &&
+            typeof router.program_address === "string" &&
+            typeof router.pool_address === "string"
+        )))
   );
 }
 
@@ -159,9 +157,9 @@ export function validateAccountPortfolio(data: any): data is AccountPortfolio {
     typeof data === "object" &&
     data !== null &&
     typeof data.total_value === "number" &&
-    typeof data.native_token === "object" &&
-    data.native_token !== null &&
-    validateToken(data.native_token) &&
+    typeof data.native_balance === "object" &&
+    data.native_balance !== null &&
+    validateToken(data.native_balance) &&
     Array.isArray(data.tokens) &&
     data.tokens.every(validateToken)
   );

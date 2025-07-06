@@ -139,7 +139,7 @@ export class TokenAPI extends BaseApiV2 {
       sortBy?: string;
       sortOrder?: string;
     },
-  ): Promise<ApiV2Response<TokenTransfer>> {
+  ): Promise<ApiV2Response<TokenTransfer[]>> {
     let methodUrl = `${this.urlModule}transfer?address=${address}`;
 
     if (options) {

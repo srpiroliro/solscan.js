@@ -8,7 +8,7 @@ export function validateApiV2Response<T>(
     typeof response === "object" &&
     response !== null &&
     typeof response.success === "boolean" &&
-    Array.isArray(response.data)
+    (Array.isArray(response.data) || typeof response.data === "object")
   );
 }
 
@@ -32,14 +32,20 @@ export function validateArrayResponse<T>(
 export function validateSingleResponse<T>(
   response: any,
   itemValidator: (item: any) => item is T
-): response is ApiV2Response<T[]> {
+): response is ApiV2Response<T> {
   if (!validateApiV2Response(response)) {
     return false;
   }
 
-  if (!Array.isArray(response.data) || response.data.length === 0) {
-    return false;
+  // Handle single object response
+  if (typeof response.data === "object" && !Array.isArray(response.data)) {
+    return itemValidator(response.data);
   }
 
-  return itemValidator(response.data[0]);
+  // Handle array response with single item (legacy format)
+  if (Array.isArray(response.data) && response.data.length > 0) {
+    return itemValidator(response.data[0]);
+  }
+
+  return false;
 }

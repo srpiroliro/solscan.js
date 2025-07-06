@@ -18,22 +18,31 @@ export function validateTokenMeta(data: any): data is TokenMeta {
     typeof data.supply === "string" &&
     typeof data.icon === "string" &&
     typeof data.holder === "number" &&
-    typeof data.creator === "string" &&
-    typeof data.create_tx === "string" &&
-    typeof data.created_time === "number" &&
-    typeof data.metadata === "object" &&
-    data.metadata !== null &&
-    typeof data.metadata.name === "string" &&
-    typeof data.metadata.symbol === "string" &&
-    typeof data.metadata.description === "string" &&
+    // Optional fields
+    (data.creator === undefined || typeof data.creator === "string") &&
+    (data.create_tx === undefined || typeof data.create_tx === "string") &&
+    (data.created_time === undefined || typeof data.created_time === "number") &&
+    (data.first_mint_tx === undefined || typeof data.first_mint_tx === "string") &&
+    (data.first_mint_time === undefined || typeof data.first_mint_time === "number") &&
+    (data.metadata === null || 
+      (typeof data.metadata === "object" &&
+        data.metadata !== null &&
+        typeof data.metadata.name === "string" &&
+        typeof data.metadata.symbol === "string" &&
+        typeof data.metadata.description === "string" &&
+        (data.metadata.twitter === undefined || typeof data.metadata.twitter === "string") &&
+        (data.metadata.website === undefined || typeof data.metadata.website === "string") &&
+        typeof data.metadata.image === "string")) &&
+    (data.metadata_uri === undefined || typeof data.metadata_uri === "string") &&
     (data.mint_authority === null || typeof data.mint_authority === "string") &&
-    (data.freeze_authority === null ||
-      typeof data.freeze_authority === "string") &&
+    (data.freeze_authority === null || typeof data.freeze_authority === "string") &&
     typeof data.price === "number" &&
-    typeof data.volume_24h === "number" &&
+    (data.volume_24h === undefined || typeof data.volume_24h === "number") &&
     typeof data.market_cap === "number" &&
-    typeof data.market_cap_rank === "number" &&
-    typeof data.price_change_24h === "number"
+    (data.market_cap_rank === null || typeof data.market_cap_rank === "number") &&
+    (data.price_change_24h === undefined || typeof data.price_change_24h === "number") &&
+    (data.total_dex_vol_24h === undefined || typeof data.total_dex_vol_24h === "number") &&
+    (data.dex_vol_change_24h === undefined || typeof data.dex_vol_change_24h === "number")
   );
 }
 
@@ -75,11 +84,18 @@ export function validateTokenHolders(data: any): data is TokenHolders {
   return (
     typeof data === "object" &&
     data !== null &&
-    typeof data.address === "string" &&
-    typeof data.amount === "number" &&
-    typeof data.decimals === "number" &&
-    typeof data.owner === "string" &&
-    typeof data.rank === "number"
+    typeof data.total === "number" &&
+    Array.isArray(data.items) &&
+    data.items.every(
+      (item: any) =>
+        typeof item === "object" &&
+        item !== null &&
+        typeof item.address === "string" &&
+        typeof item.amount === "number" &&
+        typeof item.decimals === "number" &&
+        typeof item.owner === "string" &&
+        typeof item.rank === "number"
+    )
   );
 }
 

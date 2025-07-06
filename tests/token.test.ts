@@ -1,8 +1,10 @@
-import { TokenAPI } from "../src/apiV2/tokenApi";
+import { TokenAPI } from "../src/api/token";
 import { makeGetRequest } from "../src/utils";
 import {
   mockTokenMeta,
+  mockTokenMetaMulti,
   mockTokenMarket,
+  mockTokenMarketInfo,
   mockTokenTransfer,
   mockTokenHolders,
   mockTokenList,
@@ -14,6 +16,13 @@ import {
   validateSingleResponse,
   validateArrayResponse,
 } from "./mocks/validators/baseValidators";
+import {
+  validateApiResponseStructure,
+  validateTypeAlignment,
+  createMockValidator,
+  assertTypeValid,
+  validateOptionalField,
+} from "./mocks/validators/typeValidationHelpers";
 import {
   validateTokenMeta,
   validateTokenMarket,
@@ -48,7 +57,7 @@ describe("TokenAPI", () => {
       expect((tokenApi as any).url).toBe("https://pro-api.solscan.io/v2.0/");
       expect((tokenApi as any).headers).toEqual({ token: TEST_API_KEY });
       expect((tokenApi as any).urlModule).toBe(
-        "https://pro-api.solscan.io/v2.0/token/"
+        "https://pro-api.solscan.io/v2.0/token/",
       );
     });
   });
@@ -61,7 +70,7 @@ describe("TokenAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/token/meta?address=${TEST_TOKEN_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockTokenMeta);
     });
@@ -86,17 +95,15 @@ describe("TokenAPI", () => {
         TEST_TOKEN_ADDRESS,
         "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       ];
-      mockMakeGetRequest.mockResolvedValue(mockTokenMeta);
+      mockMakeGetRequest.mockResolvedValue(mockTokenMetaMulti);
 
       const result = await tokenApi.metaMulti(addresses);
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
-        `https://pro-api.solscan.io/v2.0/token/meta?address=${addresses.join(
-          ","
-        )}`,
-        { token: TEST_API_KEY }
+        `https://pro-api.solscan.io/v2.0/token/meta/multi?address[]=${addresses[0]}&address[]=${addresses[1]}`,
+        { token: TEST_API_KEY },
       );
-      expect(result).toEqual(mockTokenMeta);
+      expect(result).toEqual(mockTokenMetaMulti);
     });
   });
 
@@ -109,7 +116,7 @@ describe("TokenAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/token/markets?token[]=${TEST_TOKEN_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockTokenMarket);
     });
@@ -125,11 +132,11 @@ describe("TokenAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         expect.stringContaining(`token[]=${tokens[0]}`),
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         expect.stringContaining(`token[]=${tokens[1]}`),
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
     });
 
@@ -153,22 +160,22 @@ describe("TokenAPI", () => {
 
     it("should throw error when no tokens provided", async () => {
       await expect(tokenApi.markets([])).rejects.toThrow(
-        "Token pair addresses are required"
+        "Token pair addresses are required",
       );
     });
   });
 
   describe("marketInfo", () => {
     it("should fetch token market info successfully", async () => {
-      mockMakeGetRequest.mockResolvedValue(mockTokenMarket);
+      mockMakeGetRequest.mockResolvedValue(mockTokenMarketInfo);
 
       const result = await tokenApi.marketInfo(TEST_TOKEN_ADDRESS);
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/token/market/info?address=${TEST_TOKEN_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
-      expect(result).toEqual(mockTokenMarket);
+      expect(result).toEqual(mockTokenMarketInfo);
     });
   });
 
@@ -180,7 +187,7 @@ describe("TokenAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/token/transfer?address=${TEST_TOKEN_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockTokenTransfer);
     });
@@ -219,7 +226,7 @@ describe("TokenAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/token/defi/activities?address=${TEST_TOKEN_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockDefiActivities);
     });
@@ -257,7 +264,7 @@ describe("TokenAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         "https://pro-api.solscan.io/v2.0/token/list?page=1",
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockTokenList);
     });
@@ -289,7 +296,7 @@ describe("TokenAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/token/market/volume?address=${TEST_TOKEN_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockVolume);
     });
@@ -316,7 +323,7 @@ describe("TokenAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         "https://pro-api.solscan.io/v2.0/token/trending?limit=10",
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockTokenList);
     });
@@ -328,7 +335,7 @@ describe("TokenAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         "https://pro-api.solscan.io/v2.0/token/trending?limit=20",
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
     });
   });
@@ -342,7 +349,7 @@ describe("TokenAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/token/price?address=${TEST_TOKEN_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockPrice);
     });
@@ -374,7 +381,7 @@ describe("TokenAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/token/holders?address=${TEST_TOKEN_ADDRESS}&page=1`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockHoldersResponse);
     });
@@ -410,7 +417,7 @@ describe("TokenAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         "https://pro-api.solscan.io/v2.0/token/top",
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockTop);
     });
@@ -422,7 +429,7 @@ describe("TokenAPI", () => {
       mockMakeGetRequest.mockRejectedValue(networkError);
 
       await expect(tokenApi.meta(TEST_TOKEN_ADDRESS)).rejects.toThrow(
-        "Network error"
+        "Network error",
       );
     });
 
@@ -440,6 +447,216 @@ describe("TokenAPI", () => {
     });
   });
 
+  describe("comprehensive type validation", () => {
+    it("should validate mock data matches TypeScript types at compile time", () => {
+      // These assignments will fail at compile time if types don't match
+      const tokenMetaMock: typeof mockTokenMeta = mockTokenMeta;
+      const tokenMarketMock: typeof mockTokenMarket = mockTokenMarket;
+      const tokenTransferMock: typeof mockTokenTransfer = mockTokenTransfer;
+      const tokenHoldersMock: typeof mockTokenHolders = mockTokenHolders;
+
+      // Runtime validation to ensure mock data structure is correct
+      expect(tokenMetaMock.success).toBe(true);
+      expect(Array.isArray(tokenMetaMock.data)).toBe(false); // Single object
+      expect(tokenMarketMock.success).toBe(true);
+      expect(Array.isArray(tokenMarketMock.data)).toBe(true); // Array
+    });
+
+    it("should validate TokenMeta with optional fields", () => {
+      const tokenMetaData = mockTokenMeta.data;
+      
+      // Test that optional fields are handled correctly
+      const creatorValidation = validateOptionalField(
+        tokenMetaData.creator,
+        (value: string) => typeof value === "string",
+        "creator"
+      );
+      expect(creatorValidation.valid).toBe(true);
+
+      const metadataValidation = validateOptionalField(
+        tokenMetaData.metadata,
+        (value: object) => typeof value === "object" && value !== null,
+        "metadata",
+        true // Allow null
+      );
+      expect(metadataValidation.valid).toBe(true);
+
+      const validation = validateTypeAlignment(
+        tokenMetaData,
+        validateTokenMeta,
+        "TokenMeta"
+      );
+
+      expect(validation.valid).toBe(true);
+      if (!validation.valid) {
+        console.error("TokenMeta validation errors:", validation.errors);
+      }
+    });
+
+    it("should validate TokenHolders nested structure", () => {
+      const holdersData = mockTokenHolders.data;
+      
+      // Validate the nested structure
+      expect(holdersData).toHaveProperty("total");
+      expect(holdersData).toHaveProperty("items");
+      expect(typeof holdersData.total).toBe("number");
+      expect(Array.isArray(holdersData.items)).toBe(true);
+
+      const validation = validateTypeAlignment(
+        holdersData,
+        validateTokenHolders,
+        "TokenHolders"
+      );
+
+      expect(validation.valid).toBe(true);
+      if (!validation.valid) {
+        console.error("TokenHolders validation errors:", validation.errors);
+      }
+    });
+
+    it("should validate TokenTransfer with block_id as string", () => {
+      const transferData = mockTokenTransfer.data[0];
+      
+      // Verify block_id is string as per type definition
+      expect(typeof transferData.block_id).toBe("string");
+
+      const validation = validateTypeAlignment(
+        transferData,
+        validateTokenTransfer,
+        "TokenTransfer"
+      );
+
+      expect(validation.valid).toBe(true);
+      if (!validation.valid) {
+        console.error("TokenTransfer validation errors:", validation.errors);
+      }
+    });
+
+    it("should validate API response structures comprehensively", () => {
+      const tokenMetaValidation = validateApiResponseStructure(
+        mockTokenMeta,
+        validateTokenMeta,
+        "TokenMeta",
+        false // Single item expected
+      );
+
+      expect(tokenMetaValidation.valid).toBe(true);
+      expect(tokenMetaValidation.structureValid).toBe(true);
+      expect(tokenMetaValidation.dataValid).toBe(true);
+
+      const tokenTransferValidation = validateApiResponseStructure(
+        mockTokenTransfer,
+        validateTokenTransfer,
+        "TokenTransfer",
+        true // Array expected
+      );
+
+      expect(tokenTransferValidation.valid).toBe(true);
+      expect(tokenTransferValidation.structureValid).toBe(true);
+      expect(tokenTransferValidation.dataValid).toBe(true);
+    });
+
+    it("should handle TokenMeta with minimal optional fields", () => {
+      // Create a token meta with minimal fields (only required ones)
+      const minimalTokenMeta = {
+        address: "So11111111111111111111111111111111111111112",
+        name: "Wrapped SOL",
+        symbol: "SOL",
+        icon: "https://example.com/sol-icon.png",
+        decimals: 9,
+        holder: 1000000,
+        supply: "1000000000000000000",
+        mint_authority: null,
+        freeze_authority: null,
+        price: 100.5,
+        market_cap: 50000000000,
+        market_cap_rank: null,
+        metadata: null,
+        // All other fields omitted (optional)
+      };
+
+      const validation = validateTypeAlignment(
+        minimalTokenMeta,
+        validateTokenMeta,
+        "TokenMeta"
+      );
+
+      expect(validation.valid).toBe(true);
+      if (!validation.valid) {
+        console.error("Minimal TokenMeta validation errors:", validation.errors);
+      }
+    });
+
+    it("should detect type mismatches in corrupted token data", () => {
+      const corruptedTokenMeta = {
+        ...mockTokenMeta.data,
+        decimals: "9", // Should be number, not string
+        holder: "1000000", // Should be number, not string
+        price: "100.5", // Should be number, not string
+      };
+
+      const validation = validateTypeAlignment(
+        corruptedTokenMeta,
+        validateTokenMeta,
+        "TokenMeta"
+      );
+
+      expect(validation.valid).toBe(false);
+      expect(validation.errors.length).toBeGreaterThan(0);
+
+      // This should throw
+      expect(() => {
+        assertTypeValid(
+          corruptedTokenMeta,
+          validateTokenMeta,
+          "TokenMeta"
+        );
+      }).toThrow();
+    });
+
+    it("should validate TokenMeta metadata nested structure", () => {
+      const tokenMeta = mockTokenMeta.data;
+      
+      if (tokenMeta.metadata !== null) {
+        expect(typeof tokenMeta.metadata.name).toBe("string");
+        expect(typeof tokenMeta.metadata.symbol).toBe("string");
+        expect(typeof tokenMeta.metadata.description).toBe("string");
+        expect(typeof tokenMeta.metadata.image).toBe("string");
+        
+        // Optional fields in metadata
+        if (tokenMeta.metadata.website) {
+          expect(typeof tokenMeta.metadata.website).toBe("string");
+        }
+        if (tokenMeta.metadata.twitter) {
+          expect(typeof tokenMeta.metadata.twitter).toBe("string");
+        }
+      }
+    });
+
+    it("should validate TokenMarket response with all required fields", () => {
+      const marketData = mockTokenMarketInfo.data;
+      
+      // Validate all required fields are present and correct type
+      expect(typeof marketData.pool_id).toBe("string");
+      expect(typeof marketData.program_id).toBe("string");
+      expect(typeof marketData.token_1).toBe("string");
+      expect(typeof marketData.token_2).toBe("string");
+      expect(typeof marketData.total_volume_24h).toBe("number");
+      expect(typeof marketData.total_trades_24h).toBe("number");
+
+      const validation = validateTypeAlignment(
+        marketData,
+        validateTokenMarket,
+        "TokenMarket"
+      );
+
+      expect(validation.valid).toBe(true);
+      if (!validation.valid) {
+        console.error("TokenMarket validation errors:", validation.errors);
+      }
+    });
+  });
+
   describe("response validation", () => {
     it("should validate token metadata response structure", async () => {
       mockMakeGetRequest.mockResolvedValue(mockTokenMeta);
@@ -450,11 +667,11 @@ describe("TokenAPI", () => {
       expect(validateSingleResponse(result, validateTokenMeta)).toBe(true);
 
       // Validate specific fields exist and have correct types
-      expect(result.data[0]).toHaveProperty("address");
-      expect(result.data[0]).toHaveProperty("symbol");
-      expect(result.data[0]).toHaveProperty("name");
-      expect(result.data[0]).toHaveProperty("decimals");
-      expect(typeof result.data[0].decimals).toBe("number");
+      expect(result.data).toHaveProperty("address");
+      expect(result.data).toHaveProperty("symbol");
+      expect(result.data).toHaveProperty("name");
+      expect(result.data).toHaveProperty("decimals");
+      expect(typeof result.data.decimals).toBe("number");
     });
 
     it("should validate token market response structure", async () => {
@@ -544,6 +761,232 @@ describe("TokenAPI", () => {
 
       expect(validateApiV2Response(result)).toBe(true);
       expect(validateSingleResponse(result, validateTokenMeta)).toBe(false);
+    });
+  });
+
+  describe("edge case validation", () => {
+    it("should handle TokenMeta with null metadata", () => {
+      const tokenWithNullMetadata = {
+        ...mockTokenMeta.data,
+        metadata: null,
+      };
+
+      const validation = validateTypeAlignment(
+        tokenWithNullMetadata,
+        validateTokenMeta,
+        "TokenMeta"
+      );
+
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should handle TokenMeta with null market_cap_rank", () => {
+      const tokenWithNullRank = {
+        ...mockTokenMeta.data,
+        market_cap_rank: null,
+      };
+
+      const validation = validateTypeAlignment(
+        tokenWithNullRank,
+        validateTokenMeta,
+        "TokenMeta"
+      );
+
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should handle TokenMeta with undefined optional fields", () => {
+      const tokenWithMinimalFields = {
+        address: "So11111111111111111111111111111111111111112",
+        name: "Wrapped SOL",
+        symbol: "SOL",
+        icon: "https://example.com/sol-icon.png",
+        decimals: 9,
+        holder: 1000000,
+        supply: "1000000000000000000",
+        mint_authority: null,
+        freeze_authority: null,
+        price: 100.5,
+        market_cap: 50000000000,
+        metadata: null,
+        market_cap_rank: null,
+        // All other optional fields undefined
+      };
+
+      const validation = validateTypeAlignment(
+        tokenWithMinimalFields,
+        validateTokenMeta,
+        "TokenMeta"
+      );
+
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should validate TokenHolders with empty items array", () => {
+      const emptyHolders = {
+        total: 0,
+        items: [],
+      };
+
+      const validation = validateTypeAlignment(
+        emptyHolders,
+        validateTokenHolders,
+        "TokenHolders"
+      );
+
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should handle TokenTransfer with boundary values", () => {
+      const transferWithBoundaryValues = {
+        ...mockTokenTransfer.data[0],
+        amount: 0, // Minimum amount
+        token_decimals: 18, // Maximum typical decimals
+        block_time: 0, // Minimum timestamp
+      };
+
+      const validation = validateTypeAlignment(
+        transferWithBoundaryValues,
+        validateTokenTransfer,
+        "TokenTransfer"
+      );
+
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should reject TokenMeta with wrong authority types", () => {
+      const tokenWithWrongAuthority = {
+        ...mockTokenMeta.data,
+        mint_authority: "invalid", // Should be null or string, but must validate as string if not null
+        freeze_authority: 123, // Should be null or string, not number
+      };
+
+      const validation = validateTypeAlignment(
+        tokenWithWrongAuthority,
+        validateTokenMeta,
+        "TokenMeta"
+      );
+
+      expect(validation.valid).toBe(false);
+    });
+
+    it("should handle TokenMarket with zero volumes", () => {
+      const marketWithZeroVolume = {
+        ...mockTokenMarketInfo.data,
+        total_volume_24h: 0,
+        total_volume_prev_24h: 0,
+        total_trades_24h: 0,
+        total_trades_prev_24h: 0,
+      };
+
+      const validation = validateTypeAlignment(
+        marketWithZeroVolume,
+        validateTokenMarket,
+        "TokenMarket"
+      );
+
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should validate large numeric values", () => {
+      const tokenWithLargeValues = {
+        ...mockTokenMeta.data,
+        holder: Number.MAX_SAFE_INTEGER,
+        market_cap: Number.MAX_SAFE_INTEGER,
+        price: 999999.99,
+      };
+
+      const validation = validateTypeAlignment(
+        tokenWithLargeValues,
+        validateTokenMeta,
+        "TokenMeta"
+      );
+
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should handle empty string fields correctly", () => {
+      const tokenWithEmptyStrings = {
+        ...mockTokenMeta.data,
+        icon: "", // Empty but valid string
+        supply: "0", // Zero supply as string
+      };
+
+      const validation = validateTypeAlignment(
+        tokenWithEmptyStrings,
+        validateTokenMeta,
+        "TokenMeta"
+      );
+
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should validate TokenHolders item structure thoroughly", () => {
+      const holdersWithVariousValues = {
+        total: 1000,
+        items: [
+          {
+            address: "So11111111111111111111111111111111111111112",
+            amount: 0, // Zero amount
+            decimals: 9,
+            owner: "11111111111111111111111111111111",
+            rank: 1,
+          },
+          {
+            address: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            amount: Number.MAX_SAFE_INTEGER, // Large amount
+            decimals: 6,
+            owner: "22222222222222222222222222222222",
+            rank: 999999, // High rank
+          },
+        ],
+      };
+
+      const validation = validateTypeAlignment(
+        holdersWithVariousValues,
+        validateTokenHolders,
+        "TokenHolders"
+      );
+
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should reject malformed API responses", () => {
+      const malformedResponse = {
+        success: "true", // Should be boolean
+        data: "not an array", // Should be array
+      };
+
+      const validation = validateApiResponseStructure(
+        malformedResponse,
+        validateTokenMeta,
+        "TokenMeta",
+        false
+      );
+
+      expect(validation.valid).toBe(false);
+      expect(validation.structureValid).toBe(false);
+    });
+
+    it("should handle TokenMeta metadata with optional nested fields", () => {
+      const tokenWithPartialMetadata = {
+        ...mockTokenMeta.data,
+        metadata: {
+          name: "Test Token",
+          symbol: "TEST",
+          description: "A test token",
+          image: "https://example.com/image.png",
+          // website and twitter are undefined (optional)
+        },
+      };
+
+      const validation = validateTypeAlignment(
+        tokenWithPartialMetadata,
+        validateTokenMeta,
+        "TokenMeta"
+      );
+
+      expect(validation.valid).toBe(true);
     });
   });
 });

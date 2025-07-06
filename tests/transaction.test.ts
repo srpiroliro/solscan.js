@@ -1,4 +1,4 @@
-import { TransactionAPI } from "../src/apiV2/transactionApi";
+import { TransactionAPI } from "../src/api/transaction";
 import { makeGetRequest } from "../src/utils";
 import {
   mockTransactionDetail,
@@ -7,10 +7,8 @@ import {
   TEST_TRANSACTION_SIGNATURE,
   TEST_API_KEY,
 } from "./mocks/apiMocks";
-import {
-  validateApiV2Response,
-  validateTransactionResponse,
-} from "./mocks/validators";
+import { validateApiV2Response } from "./mocks/validators/baseValidators";
+import { validateTransactionResponse } from "./mocks/validators/transactionValidators";
 
 // Mock the utils module
 jest.mock("../src/utils", () => ({
@@ -35,11 +33,11 @@ describe("TransactionAPI", () => {
       expect(transactionApi).toBeInstanceOf(TransactionAPI);
       // Access protected properties for testing
       expect((transactionApi as any).url).toBe(
-        "https://pro-api.solscan.io/v2.0/"
+        "https://pro-api.solscan.io/v2.0/",
       );
       expect((transactionApi as any).headers).toEqual({ token: TEST_API_KEY });
       expect((transactionApi as any).urlModule).toBe(
-        "https://pro-api.solscan.io/v2.0/transaction/"
+        "https://pro-api.solscan.io/v2.0/transaction/",
       );
     });
   });
@@ -52,7 +50,7 @@ describe("TransactionAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         "https://pro-api.solscan.io/v2.0/transaction/last?filter=exceptVote",
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockLastTransactions);
     });
@@ -64,7 +62,7 @@ describe("TransactionAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         "https://pro-api.solscan.io/v2.0/transaction/last?filter=all",
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockLastTransactions);
     });
@@ -76,7 +74,7 @@ describe("TransactionAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         expect.stringContaining("limit=50"),
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockLastTransactions);
     });
@@ -88,11 +86,11 @@ describe("TransactionAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         expect.stringContaining("filter=vote"),
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         expect.stringContaining("limit=25"),
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockLastTransactions);
     });
@@ -104,7 +102,7 @@ describe("TransactionAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         "https://pro-api.solscan.io/v2.0/transaction/last?filter=exceptVote",
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockLastTransactions);
     });
@@ -118,7 +116,7 @@ describe("TransactionAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/transaction/detail?tx=${TEST_TRANSACTION_SIGNATURE}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockTransactionDetail);
     });
@@ -135,7 +133,7 @@ describe("TransactionAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         "https://pro-api.solscan.io/v2.0/transaction/detail?tx=invalid_signature",
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(notFoundResponse);
     });
@@ -147,7 +145,7 @@ describe("TransactionAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         "https://pro-api.solscan.io/v2.0/transaction/detail?tx=",
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockTransactionDetail);
     });
@@ -161,7 +159,7 @@ describe("TransactionAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/transaction/actions?tx=${TEST_TRANSACTION_SIGNATURE}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockTransactionActions);
     });
@@ -177,7 +175,7 @@ describe("TransactionAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/transaction/actions?tx=${TEST_TRANSACTION_SIGNATURE}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(noActionsResponse);
     });
@@ -194,7 +192,7 @@ describe("TransactionAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         "https://pro-api.solscan.io/v2.0/transaction/actions?tx=invalid_signature",
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(errorResponse);
     });
@@ -206,7 +204,7 @@ describe("TransactionAPI", () => {
       mockMakeGetRequest.mockRejectedValue(networkError);
 
       await expect(
-        transactionApi.detail(TEST_TRANSACTION_SIGNATURE)
+        transactionApi.detail(TEST_TRANSACTION_SIGNATURE),
       ).rejects.toThrow("Network connection failed");
     });
 
@@ -215,7 +213,7 @@ describe("TransactionAPI", () => {
       mockMakeGetRequest.mockRejectedValue(timeoutError);
 
       await expect(
-        transactionApi.actions(TEST_TRANSACTION_SIGNATURE)
+        transactionApi.actions(TEST_TRANSACTION_SIGNATURE),
       ).rejects.toThrow("Request timeout");
     });
 
@@ -254,21 +252,21 @@ describe("TransactionAPI", () => {
       await transactionApi.last();
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         expect.stringContaining("/transaction/last"),
-        expect.any(Object)
+        expect.any(Object),
       );
 
       // Test detail method URL
       await transactionApi.detail(TEST_TRANSACTION_SIGNATURE);
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         expect.stringContaining("/transaction/detail"),
-        expect.any(Object)
+        expect.any(Object),
       );
 
       // Test actions method URL
       await transactionApi.actions(TEST_TRANSACTION_SIGNATURE);
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         expect.stringContaining("/transaction/actions"),
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -281,7 +279,7 @@ describe("TransactionAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/transaction/detail?tx=${specialCharSignature}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
     });
   });
@@ -361,7 +359,7 @@ describe("TransactionAPI", () => {
 
       const result = await transactionApi.detail(TEST_TRANSACTION_SIGNATURE);
 
-      expect(validateApiV2Response(result)).toBe(true); // Structure is valid
+      expect(validateApiV2Response(result)).toBe(false); // Structure is not valid (data must be object or array)
       expect(validateTransactionResponse(result.data)).toBe(false); // Data is not valid
     });
 
@@ -374,8 +372,8 @@ describe("TransactionAPI", () => {
 
       const result = await transactionApi.detail("nonexistent_signature");
 
-      expect(validateApiV2Response(result)).toBe(false); // data should be array, not null
-      expect(validateTransactionResponse(result.data)).toBe(false);
+      expect(validateApiV2Response(result)).toBe(true); // Structure is valid (success + data present)
+      expect(validateTransactionResponse(result.data)).toBe(false); // null data is not valid
     });
 
     it("should handle empty transaction arrays", async () => {

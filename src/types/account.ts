@@ -125,7 +125,7 @@ type Token = {
 
 export type AccountPortfolio = {
   total_value: number; // usd
-  native_token: Token;
+  native_balance: Token;
   tokens: Token[];
 };
 

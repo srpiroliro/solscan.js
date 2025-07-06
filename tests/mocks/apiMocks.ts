@@ -21,6 +21,37 @@ import {
 // Mock API responses
 export const mockTokenMeta: ApiV2Response<TokenMeta> = {
   success: true,
+  data: {
+    address: "So11111111111111111111111111111111111111112",
+    name: "Wrapped SOL",
+    symbol: "SOL",
+    icon: "https://example.com/sol-icon.png",
+    decimals: 9,
+    holder: 1000000,
+    creator: "11111111111111111111111111111111",
+    create_tx: "abcdef1234567890",
+    created_time: 1640995200,
+    metadata: {
+      name: "Wrapped SOL",
+      image: "https://example.com/sol-icon.png",
+      symbol: "SOL",
+      description: "Wrapped Solana token",
+      website: "https://solana.com",
+      twitter: "https://twitter.com/solana",
+    },
+    mint_authority: null,
+    freeze_authority: null,
+    supply: "1000000000000000000",
+    price: 100.5,
+    volume_24h: 1000000,
+    market_cap: 50000000000,
+    market_cap_rank: 5,
+    price_change_24h: 2.5,
+  },
+};
+
+export const mockTokenMetaMulti: ApiV2Response<TokenMeta[]> = {
+  success: true,
   data: [
     {
       address: "So11111111111111111111111111111111111111112",
@@ -49,10 +80,37 @@ export const mockTokenMeta: ApiV2Response<TokenMeta> = {
       market_cap_rank: 5,
       price_change_24h: 2.5,
     },
+    {
+      address: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      name: "USD Coin",
+      symbol: "USDC",
+      icon: "https://example.com/usdc-icon.png",
+      decimals: 6,
+      holder: 500000,
+      creator: "11111111111111111111111111111111",
+      create_tx: "fedcba0987654321",
+      created_time: 1640995300,
+      metadata: {
+        name: "USD Coin",
+        image: "https://example.com/usdc-icon.png",
+        symbol: "USDC",
+        description: "USD Coin stablecoin",
+        website: "https://centre.io",
+        twitter: "https://twitter.com/centre_io",
+      },
+      mint_authority: null,
+      freeze_authority: null,
+      supply: "500000000000000",
+      price: 1.0,
+      volume_24h: 500000,
+      market_cap: 30000000000,
+      market_cap_rank: 3,
+      price_change_24h: 0.1,
+    },
   ],
 };
 
-export const mockTokenMarket: ApiV2Response<TokenMarket> = {
+export const mockTokenMarket: ApiV2Response<TokenMarket[]> = {
   success: true,
   data: [
     {
@@ -70,7 +128,23 @@ export const mockTokenMarket: ApiV2Response<TokenMarket> = {
   ],
 };
 
-export const mockTokenTransfer: ApiV2Response<TokenTransfer> = {
+export const mockTokenMarketInfo: ApiV2Response<TokenMarket> = {
+  success: true,
+  data: {
+    pool_id: "pool123456789",
+    program_id: "program123456789",
+    token_1: "So11111111111111111111111111111111111111112",
+    token_2: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    token_account_1: "account123456789",
+    token_account_2: "account987654321",
+    total_trades_24h: 1000,
+    total_trades_prev_24h: 950,
+    total_volume_24h: 1000000,
+    total_volume_prev_24h: 950000,
+  },
+};
+
+export const mockTokenTransfer: ApiV2Response<TokenTransfer[]> = {
   success: true,
   data: [
     {
@@ -180,17 +254,15 @@ export const mockLastTransactions = {
 // Account Mock Data
 export const mockAccountDetail = {
   success: true,
-  data: [
-    {
-      account: "HYe4vSaEGqQKnDrxWDrk3o5H2gznv7qtij5G6NNG8WHd",
-      lamports: 2000000000,
-      type: "account",
-      executable: false,
-      owner_program: "11111111111111111111111111111111",
-      rent_epoch: 361,
-      is_oncurve: 1,
-    },
-  ],
+  data: {
+    account: "HYe4vSaEGqQKnDrxWDrk3o5H2gznv7qtij5G6NNG8WHd",
+    lamports: 2000000000,
+    type: "account",
+    executable: false,
+    owner_program: "11111111111111111111111111111111",
+    rent_epoch: 361,
+    is_oncurve: 1,
+  },
 };
 
 export const mockAccountTransfer = {
@@ -224,10 +296,17 @@ export const mockAccountDefiActivity = {
       time: "2022-01-01T00:00:00.000Z",
       activity_type: "swap",
       from_address: "HYe4vSaEGqQKnDrxWDrk3o5H2gznv7qtij5G6NNG8WHd",
-      to_address: "22222222222222222222222222222222",
-      sources: {
-        platform: "raydium",
-        routers: [
+      sources: ["raydium"],
+      platform: ["raydium"],
+      value: 1000.5,
+      routers: {
+        token1: "So11111111111111111111111111111111111111112",
+        token1_decimals: 9,
+        amount1: 1000000000,
+        token2: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        token2_decimals: 6,
+        amount2: 100000000,
+        child_routers: [
           {
             token1: "So11111111111111111111111111111111111111112",
             token1_decimals: 9,
@@ -235,9 +314,10 @@ export const mockAccountDefiActivity = {
             token2: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
             token2_decimals: 6,
             amount2: "100000000",
-          },
-        ],
-        child_routers: [],
+            program_address: "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+            pool_address: "58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWBkwMihLYQo2"
+          }
+        ]
       },
     },
   ],
@@ -290,34 +370,32 @@ export const mockAccountTransaction = {
 
 export const mockAccountPortfolio = {
   success: true,
-  data: [
-    {
-      total_value: 1500.5,
-      native_token: {
-        amount: 2000000000,
-        balance: 2.0,
-        token_price: 100.5,
-        token_decimals: 9,
-        token_name: "Solana",
-        token_symbol: "SOL",
-        token_icon: "https://example.com/sol-icon.png",
-        value: 201.0,
-      },
-      tokens: [
-        {
-          token_address: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-          amount: 1000000000,
-          balance: 1000.0,
-          token_price: 1.0,
-          token_decimals: 6,
-          token_name: "USD Coin",
-          token_symbol: "USDC",
-          token_icon: "https://example.com/usdc-icon.png",
-          value: 1000.0,
-        },
-      ],
+  data: {
+    total_value: 1500.5,
+    native_balance: {
+      amount: 2000000000,
+      balance: 2.0,
+      token_price: 100.5,
+      token_decimals: 9,
+      token_name: "Solana",
+      token_symbol: "SOL",
+      token_icon: "https://example.com/sol-icon.png",
+      value: 201.0,
     },
-  ],
+    tokens: [
+      {
+        token_address: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        amount: 1000000000,
+        balance: 1000.0,
+        token_price: 1.0,
+        token_decimals: 6,
+        token_name: "USD Coin",
+        token_symbol: "USDC",
+        token_icon: "https://example.com/usdc-icon.png",
+        value: 1000.0,
+      },
+    ],
+  },
 };
 
 export const mockAccountTokenAccount = {
@@ -335,15 +413,13 @@ export const mockAccountTokenAccount = {
 
 export const mockAccountMetadata = {
   success: true,
-  data: [
-    {
-      account_address: "HYe4vSaEGqQKnDrxWDrk3o5H2gznv7qtij5G6NNG8WHd",
-      account_label: "Test Account",
-      account_icon: "https://example.com/account-icon.png",
-      account_tags: ["verified", "exchange"],
-      account_type: "wallet",
-    },
-  ],
+  data: {
+    account_address: "HYe4vSaEGqQKnDrxWDrk3o5H2gznv7qtij5G6NNG8WHd",
+    account_label: "Test Account",
+    account_icon: "https://example.com/account-icon.png",
+    account_tags: ["verified", "exchange"],
+    account_type: "wallet",
+  },
 };
 
 export const mockAccountLeaderboard = {

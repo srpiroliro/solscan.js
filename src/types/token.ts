@@ -37,7 +37,7 @@ export type TokenDefiActivities = {
   activity_type: string;
   from_address: string;
   to_address: string;
-  platform: string;
+  platform: string[]; // NOTE: example docs mention string, but api returns string[].
   sources: string[];
   routers: Routers;
 };

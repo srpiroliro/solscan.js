@@ -1,4 +1,4 @@
-import { AccountAPI } from "../src/apiV2/accountApi";
+import { AccountAPI } from "../src/api/account";
 import { makeGetRequest } from "../src/utils";
 import {
   mockAccountDetail,
@@ -19,6 +19,13 @@ import {
   validateSingleResponse,
   validateArrayResponse,
 } from "./mocks/validators/baseValidators";
+import {
+  validateApiResponseStructure,
+  validateTypeAlignment,
+  createMockValidator,
+  assertTypeValid,
+  validateOptionalField,
+} from "./mocks/validators/typeValidationHelpers";
 import {
   validateAccountDetail,
   validateAccountTransfer,
@@ -56,7 +63,7 @@ describe("AccountAPI", () => {
       expect((accountApi as any).url).toBe("https://pro-api.solscan.io/v2.0/");
       expect((accountApi as any).headers).toEqual({ token: TEST_API_KEY });
       expect((accountApi as any).urlModule).toBe(
-        "https://pro-api.solscan.io/v2.0/account/"
+        "https://pro-api.solscan.io/v2.0/account/",
       );
     });
   });
@@ -69,7 +76,7 @@ describe("AccountAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/account/detail?address=${TEST_ACCOUNT_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockAccountDetail);
     });
@@ -96,7 +103,7 @@ describe("AccountAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/account/defi/activities?address=${TEST_ACCOUNT_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockAccountDefiActivity);
     });
@@ -133,7 +140,7 @@ describe("AccountAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/account/transfer?address=${TEST_ACCOUNT_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockAccountTransfer);
     });
@@ -171,12 +178,12 @@ describe("AccountAPI", () => {
 
       const result = await accountApi.tokenAccounts(
         TEST_ACCOUNT_ADDRESS,
-        "token"
+        "token",
       );
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/account/token-accounts?address=${TEST_ACCOUNT_ADDRESS}&type=token`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockAccountTokenAccount);
     });
@@ -188,7 +195,7 @@ describe("AccountAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         expect.stringContaining("type=nft"),
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
     });
 
@@ -213,13 +220,12 @@ describe("AccountAPI", () => {
     it("should fetch balance change activities successfully", async () => {
       mockMakeGetRequest.mockResolvedValue(mockAccountBalanceChange);
 
-      const result = await accountApi.balanceChangeActivities(
-        TEST_ACCOUNT_ADDRESS
-      );
+      const result =
+        await accountApi.balanceChangeActivities(TEST_ACCOUNT_ADDRESS);
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/account/balance_change?address=${TEST_ACCOUNT_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockAccountBalanceChange);
     });
@@ -255,7 +261,7 @@ describe("AccountAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/account/transactions?address=${TEST_ACCOUNT_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockAccountTransaction);
     });
@@ -270,7 +276,7 @@ describe("AccountAPI", () => {
       await accountApi.transactions(TEST_ACCOUNT_ADDRESS, options);
 
       const expectedUrl = expect.stringContaining(
-        "before=before_signature_123"
+        "before=before_signature_123",
       );
       expect(mockMakeGetRequest).toHaveBeenCalledWith(expectedUrl, {
         token: TEST_API_KEY,
@@ -286,7 +292,7 @@ describe("AccountAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/account/stake?address=${TEST_ACCOUNT_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockAccountStake);
     });
@@ -317,12 +323,12 @@ describe("AccountAPI", () => {
       const result = await accountApi.rewardsExport(
         TEST_ACCOUNT_ADDRESS,
         timeFrom,
-        timeTo
+        timeTo,
       );
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/account/reward/export?address=${TEST_ACCOUNT_ADDRESS}&time_from=${timeFrom}&time_to=${timeTo}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockRewardsExport);
     });
@@ -337,7 +343,7 @@ describe("AccountAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/account/transfer/export?address=${TEST_ACCOUNT_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockTransferExport);
     });
@@ -374,7 +380,7 @@ describe("AccountAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/account/portfolio?address=${TEST_ACCOUNT_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockAccountPortfolio);
     });
@@ -388,7 +394,7 @@ describe("AccountAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         `https://pro-api.solscan.io/v2.0/account/metadata?address=${TEST_ACCOUNT_ADDRESS}`,
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockAccountMetadata);
     });
@@ -409,7 +415,7 @@ describe("AccountAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         expect.stringContaining("sort_by=total_values"),
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
       expect(result).toEqual(mockAccountLeaderboard);
     });
@@ -423,7 +429,7 @@ describe("AccountAPI", () => {
 
       expect(mockMakeGetRequest).toHaveBeenCalledWith(
         "https://pro-api.solscan.io/v2.0/account/leaderboard",
-        { token: TEST_API_KEY }
+        { token: TEST_API_KEY },
       );
     });
   });
@@ -434,7 +440,7 @@ describe("AccountAPI", () => {
       mockMakeGetRequest.mockRejectedValue(networkError);
 
       await expect(accountApi.detail(TEST_ACCOUNT_ADDRESS)).rejects.toThrow(
-        "Network connection failed"
+        "Network connection failed",
       );
     });
 
@@ -469,6 +475,167 @@ describe("AccountAPI", () => {
     });
   });
 
+  describe("comprehensive type validation", () => {
+    it("should validate mock data matches TypeScript types at compile time", () => {
+      // These assignments will fail at compile time if types don't match
+      const accountDetailMock: typeof mockAccountDetail = mockAccountDetail;
+      const accountTransferMock: typeof mockAccountTransfer = mockAccountTransfer;
+      const accountDefiActivityMock: typeof mockAccountDefiActivity = mockAccountDefiActivity;
+      const accountPortfolioMock: typeof mockAccountPortfolio = mockAccountPortfolio;
+
+      // Runtime validation to ensure mock data structure is correct
+      expect(accountDetailMock.success).toBe(true);
+      expect(Array.isArray(accountDetailMock.data)).toBe(false); // Single object
+      expect(accountTransferMock.success).toBe(true);
+      expect(Array.isArray(accountTransferMock.data)).toBe(true); // Array
+    });
+
+    it("should validate AccountDetail type alignment", () => {
+      const validation = validateTypeAlignment(
+        mockAccountDetail.data,
+        validateAccountDetail,
+        "AccountDetail"
+      );
+
+      expect(validation.valid).toBe(true);
+      if (!validation.valid) {
+        console.error("AccountDetail validation errors:", validation.errors);
+      }
+
+      // Type assertion - will throw if validation fails
+      assertTypeValid(
+        mockAccountDetail.data,
+        validateAccountDetail,
+        "AccountDetail"
+      );
+    });
+
+    it("should validate AccountPortfolio with native_balance field", () => {
+      const portfolioData = mockAccountPortfolio.data;
+      
+      // Validate that it has native_balance, not native_token
+      expect(portfolioData).toHaveProperty("native_balance");
+      expect(portfolioData).not.toHaveProperty("native_token");
+
+      const validation = validateTypeAlignment(
+        portfolioData,
+        validateAccountPortfolio,
+        "AccountPortfolio"
+      );
+
+      expect(validation.valid).toBe(true);
+      if (!validation.valid) {
+        console.error("AccountPortfolio validation errors:", validation.errors);
+      }
+    });
+
+    it("should validate AccountDefiActivity with correct structure", () => {
+      const defiData = mockAccountDefiActivity.data[0];
+      
+      // Validate new structure matches type definition
+      expect(Array.isArray(defiData.sources)).toBe(true);
+      expect(Array.isArray(defiData.platform)).toBe(true);
+      expect(typeof defiData.value).toBe("number");
+      expect(typeof defiData.routers).toBe("object");
+
+      const validation = validateTypeAlignment(
+        defiData,
+        validateAccountDefiActivity,
+        "AccountDefiActivity"
+      );
+
+      expect(validation.valid).toBe(true);
+      if (!validation.valid) {
+        console.error("AccountDefiActivity validation errors:", validation.errors);
+      }
+    });
+
+    it("should validate API response structure comprehensively", () => {
+      const accountDetailValidation = validateApiResponseStructure(
+        mockAccountDetail,
+        validateAccountDetail,
+        "AccountDetail",
+        false // Single item expected
+      );
+
+      expect(accountDetailValidation.valid).toBe(true);
+      expect(accountDetailValidation.structureValid).toBe(true);
+      expect(accountDetailValidation.dataValid).toBe(true);
+
+      const accountTransferValidation = validateApiResponseStructure(
+        mockAccountTransfer,
+        validateAccountTransfer,
+        "AccountTransfer",
+        true // Array expected
+      );
+
+      expect(accountTransferValidation.valid).toBe(true);
+      expect(accountTransferValidation.structureValid).toBe(true);
+      expect(accountTransferValidation.dataValid).toBe(true);
+    });
+
+    it("should validate optional fields handling", () => {
+      const stakeData = mockAccountStake.data[0];
+      
+      // Test deactivation_epoch which can be null or number
+      const deactivationValidation = validateOptionalField(
+        stakeData.deactivation_epoch,
+        (value: number) => typeof value === "number",
+        "deactivation_epoch",
+        true // Allow null
+      );
+
+      expect(deactivationValidation.valid).toBe(true);
+    });
+
+    it("should detect type mismatches in corrupted data", () => {
+      const corruptedAccountDetail = {
+        ...mockAccountDetail.data,
+        lamports: "2000000000", // Should be number, not string
+        executable: "false", // Should be boolean, not string
+      };
+
+      const validation = validateTypeAlignment(
+        corruptedAccountDetail,
+        validateAccountDetail,
+        "AccountDetail"
+      );
+
+      expect(validation.valid).toBe(false);
+      expect(validation.errors.length).toBeGreaterThan(0);
+
+      // This should throw
+      expect(() => {
+        assertTypeValid(
+          corruptedAccountDetail,
+          validateAccountDetail,
+          "AccountDetail"
+        );
+      }).toThrow();
+    });
+
+    it("should validate nested object structures", () => {
+      const portfolioData = mockAccountPortfolio.data;
+      
+      // Validate native_balance token structure
+      const nativeBalance = portfolioData.native_balance;
+      expect(typeof nativeBalance.amount).toBe("number");
+      expect(typeof nativeBalance.balance).toBe("number");
+      expect(typeof nativeBalance.token_decimals).toBe("number");
+      expect(typeof nativeBalance.token_name).toBe("string");
+      expect(typeof nativeBalance.token_symbol).toBe("string");
+      expect(typeof nativeBalance.value).toBe("number");
+
+      // Validate tokens array
+      portfolioData.tokens.forEach((token, index) => {
+        expect(typeof token.token_address).toBe("string");
+        expect(typeof token.amount).toBe("number");
+        expect(typeof token.balance).toBe("number");
+        expect(typeof token.token_decimals).toBe("number");
+      });
+    });
+  });
+
   describe("response validation", () => {
     it("should validate account detail response structure", async () => {
       mockMakeGetRequest.mockResolvedValue(mockAccountDetail);
@@ -479,11 +646,11 @@ describe("AccountAPI", () => {
       expect(validateSingleResponse(result, validateAccountDetail)).toBe(true);
 
       // Validate specific fields exist and have correct types
-      expect(result.data[0]).toHaveProperty("account");
-      expect(result.data[0]).toHaveProperty("lamports");
-      expect(result.data[0]).toHaveProperty("executable");
-      expect(typeof (result.data[0] as any).lamports).toBe("number");
-      expect(typeof (result.data[0] as any).executable).toBe("boolean");
+      expect(result.data).toHaveProperty("account");
+      expect(result.data).toHaveProperty("lamports");
+      expect(result.data).toHaveProperty("executable");
+      expect(typeof result.data.lamports).toBe("number");
+      expect(typeof result.data.executable).toBe("boolean");
     });
 
     it("should validate account transfer response structure", async () => {
@@ -510,7 +677,7 @@ describe("AccountAPI", () => {
 
       expect(validateApiV2Response(result)).toBe(true);
       expect(validateArrayResponse(result, validateAccountDefiActivity)).toBe(
-        true
+        true,
       );
 
       // Validate specific fields
@@ -525,13 +692,12 @@ describe("AccountAPI", () => {
     it("should validate account balance change response structure", async () => {
       mockMakeGetRequest.mockResolvedValue(mockAccountBalanceChange);
 
-      const result = await accountApi.balanceChangeActivities(
-        TEST_ACCOUNT_ADDRESS
-      );
+      const result =
+        await accountApi.balanceChangeActivities(TEST_ACCOUNT_ADDRESS);
 
       expect(validateApiV2Response(result)).toBe(true);
       expect(validateArrayResponse(result, validateAccountBalanceChange)).toBe(
-        true
+        true,
       );
 
       // Validate specific fields
@@ -551,15 +717,15 @@ describe("AccountAPI", () => {
 
       expect(validateApiV2Response(result)).toBe(true);
       expect(validateSingleResponse(result, validateAccountPortfolio)).toBe(
-        true
+        true,
       );
 
       // Validate specific fields
-      expect(result.data[0]).toHaveProperty("total_value");
-      expect(result.data[0]).toHaveProperty("native_token");
-      expect(result.data[0]).toHaveProperty("tokens");
-      expect(typeof (result.data[0] as any).total_value).toBe("number");
-      expect(Array.isArray((result.data[0] as any).tokens)).toBe(true);
+      expect(result.data).toHaveProperty("total_value");
+      expect(result.data).toHaveProperty("native_balance");
+      expect(result.data).toHaveProperty("tokens");
+      expect(typeof result.data.total_value).toBe("number");
+      expect(Array.isArray(result.data.tokens)).toBe(true);
     });
 
     it("should handle malformed account responses gracefully", async () => {
@@ -697,10 +863,17 @@ describe("AccountAPI", () => {
         time: "2022-01-01T00:00:00.000Z",
         activity_type: "swap",
         from_address: "HYe4vSaEGqQKnDrxWDrk3o5H2gznv7qtij5G6NNG8WHd",
-        to_address: "22222222222222222222222222222222",
-        sources: {
-          platform: "raydium",
-          routers: [
+        sources: ["raydium"],
+        platform: ["raydium"],
+        value: 1000.5,
+        routers: {
+          token1: "So11111111111111111111111111111111111111112",
+          token1_decimals: 9,
+          amount1: 1000000000,
+          token2: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          token2_decimals: 6,
+          amount2: 100000000,
+          child_routers: [
             {
               token1: "So11111111111111111111111111111111111111112",
               token1_decimals: 9,
@@ -708,9 +881,10 @@ describe("AccountAPI", () => {
               token2: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
               token2_decimals: 6,
               amount2: "100000000",
-            },
-          ],
-          child_routers: [],
+              program_address: "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+              pool_address: "58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWBkwMihLYQo2"
+            }
+          ]
         },
       };
 
@@ -719,18 +893,13 @@ describe("AccountAPI", () => {
       // Test with invalid router structure
       const invalidDefiActivity = {
         ...validDefiActivity,
-        sources: {
-          ...validDefiActivity.sources,
-          routers: [
-            {
-              token1: "So11111111111111111111111111111111111111112",
-              // Missing token1_decimals
-              amount1: "1000000000",
-              token2: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-              token2_decimals: 6,
-              amount2: "100000000",
-            },
-          ],
+        routers: {
+          token1: "So11111111111111111111111111111111111111112",
+          // Missing token1_decimals
+          amount1: 1000000000,
+          token2: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          token2_decimals: 6,
+          amount2: 100000000,
         },
       };
 
@@ -740,7 +909,7 @@ describe("AccountAPI", () => {
     it("should validate AccountPortfolio with Token structure", async () => {
       const validPortfolio = {
         total_value: 1500.5,
-        native_token: {
+        native_balance: {
           amount: 2000000000,
           balance: 2.0,
           token_price: 100.5,
@@ -818,6 +987,195 @@ describe("AccountAPI", () => {
         deactivation_epoch: "invalid",
       };
       expect(validateAccountStake(invalidStake2)).toBe(false);
+    });
+  });
+
+  describe("edge case validation", () => {
+    it("should handle AccountStake with null deactivation_epoch", () => {
+      const stakeWithNullDeactivation = {
+        ...mockAccountStake.data[0],
+        deactivation_epoch: null,
+      };
+
+      const validation = validateTypeAlignment(
+        stakeWithNullDeactivation,
+        validateAccountStake,
+        "AccountStake"
+      );
+
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should handle AccountStake with number deactivation_epoch", () => {
+      const stakeWithNumberDeactivation = {
+        ...mockAccountStake.data[0],
+        deactivation_epoch: 400,
+      };
+
+      const validation = validateTypeAlignment(
+        stakeWithNumberDeactivation,
+        validateAccountStake,
+        "AccountStake"
+      );
+
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should handle AccountPortfolio tokens with and without token_address", () => {
+      const portfolioWithMixedTokens = {
+        ...mockAccountPortfolio.data,
+        tokens: [
+          {
+            // Token with address
+            token_address: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            amount: 1000000000,
+            balance: 1000.0,
+            token_price: 1.0,
+            token_decimals: 6,
+            token_name: "USD Coin",
+            token_symbol: "USDC",
+            token_icon: "https://example.com/usdc-icon.png",
+            value: 1000.0,
+          },
+          {
+            // Native token without address (token_address is undefined)
+            amount: 2000000000,
+            balance: 2.0,
+            token_price: 100.5,
+            token_decimals: 9,
+            token_name: "Solana",
+            token_symbol: "SOL",
+            token_icon: "https://example.com/sol-icon.png",
+            value: 201.0,
+          },
+        ],
+      };
+
+      const validation = validateTypeAlignment(
+        portfolioWithMixedTokens,
+        validateAccountPortfolio,
+        "AccountPortfolio"
+      );
+
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should reject AccountBalanceChange with invalid change_type", () => {
+      const invalidBalanceChange = {
+        ...mockAccountBalanceChange.data[0],
+        change_type: "invalid" as any, // Should be "inc" or "dec"
+      };
+
+      const validation = validateTypeAlignment(
+        invalidBalanceChange,
+        validateAccountBalanceChange,
+        "AccountBalanceChange"
+      );
+
+      expect(validation.valid).toBe(false);
+    });
+
+    it("should handle empty arrays correctly", () => {
+      const emptyTransferResponse = {
+        success: true,
+        data: [],
+      };
+
+      const validation = validateApiResponseStructure(
+        emptyTransferResponse,
+        validateAccountTransfer,
+        "AccountTransfer",
+        true
+      );
+
+      expect(validation.structureValid).toBe(true);
+      expect(validation.dataValid).toBe(true); // Empty array is valid
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should validate AccountDefiActivity with optional child_routers", () => {
+      // Test with empty child_routers array
+      const defiWithEmptyChildRouters = {
+        ...mockAccountDefiActivity.data[0],
+        routers: {
+          ...mockAccountDefiActivity.data[0].routers,
+          child_routers: [],
+        },
+      };
+
+      const validation = validateTypeAlignment(
+        defiWithEmptyChildRouters,
+        validateAccountDefiActivity,
+        "AccountDefiActivity"
+      );
+
+      expect(validation.valid).toBe(true);
+
+      // Test without child_routers property (undefined)
+      const defiWithoutChildRouters = {
+        ...mockAccountDefiActivity.data[0],
+        routers: {
+          token1: "So11111111111111111111111111111111111111112",
+          token1_decimals: 9,
+          amount1: 1000000000,
+          token2_decimals: 6,
+          amount2: 100000000,
+          // child_routers is undefined
+        },
+      };
+
+      const validation2 = validateTypeAlignment(
+        defiWithoutChildRouters,
+        validateAccountDefiActivity,
+        "AccountDefiActivity"
+      );
+
+      expect(validation2.valid).toBe(true);
+    });
+
+    it("should handle boundary numeric values", () => {
+      const accountDetailWithBoundaryValues = {
+        ...mockAccountDetail.data,
+        lamports: 0, // Minimum value
+        rent_epoch: Number.MAX_SAFE_INTEGER, // Large value
+      };
+
+      const validation = validateTypeAlignment(
+        accountDetailWithBoundaryValues,
+        validateAccountDetail,
+        "AccountDetail"
+      );
+
+      expect(validation.valid).toBe(true);
+    });
+
+    it("should validate boolean fields correctly", () => {
+      const accountDetailWithBooleans = {
+        ...mockAccountDetail.data,
+        executable: true, // Test true
+      };
+
+      const validation = validateTypeAlignment(
+        accountDetailWithBooleans,
+        validateAccountDetail,
+        "AccountDetail"
+      );
+
+      expect(validation.valid).toBe(true);
+
+      // Test with false
+      const accountDetailWithFalse = {
+        ...mockAccountDetail.data,
+        executable: false,
+      };
+
+      const validation2 = validateTypeAlignment(
+        accountDetailWithFalse,
+        validateAccountDetail,
+        "AccountDetail"
+      );
+
+      expect(validation2.valid).toBe(true);
     });
   });
 });
